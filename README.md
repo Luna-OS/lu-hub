@@ -4,6 +4,20 @@ Fabric-Mod für **Minecraft 26.3**: Nachthimmel-Theme für HUD, Inventar und all
 eine frei verschiebbare und farbig markierte F3-Ansicht, Pride-Varianten für die Statusleisten
 und **Axo**, das Maskottchen, als animierter Rezeptbuch-Knopf im Inventar.
 
+| Inventar mit Axo | Truhe | Ofen |
+|---|---|---|
+| ![Inventar](docs/inventar.png) | ![Truhe](docs/truhe.png) | ![Ofen](docs/ofen.png) |
+
+| HUD (Trans) | HUD (Regenbogen) | F3-Ansicht |
+|---|---|---|
+| ![HUD Trans](docs/hud-trans.png) | ![HUD Regenbogen](docs/hud-regenbogen.png) | ![F3](docs/f3.png) |
+
+| HUD-Editor | Farbwähler |
+|---|---|
+| ![HUD-Editor](docs/hud-editor.png) | ![Farbwähler](docs/farbwaehler.png) |
+
+*(Screenshots aus dem automatischen Spieltest, mit REI installiert.)*
+
 ## Installation
 
 1. [Fabric Loader](https://fabricmc.net/use/) ≥ 0.19.5 für Minecraft 26.3 installieren
