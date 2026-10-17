@@ -32,7 +32,7 @@ public final class LuHud {
 
 	public static void register() {
 		HudElementRegistry.replaceElement(VanillaHudElements.HOTBAR, original -> wrap(HudElementType.HOTBAR, original, null));
-		HudElementRegistry.replaceElement(VanillaHudElements.ARMOR_BAR, original -> wrap(HudElementType.ARMOR, original, null));
+		HudElementRegistry.replaceElement(VanillaHudElements.ARMOR_BAR, original -> wrap(HudElementType.ARMOR, original, StatusBars::armor));
 		HudElementRegistry.replaceElement(VanillaHudElements.HEALTH_BAR, original -> wrap(HudElementType.HEALTH, original, StatusBars::health));
 		HudElementRegistry.replaceElement(VanillaHudElements.FOOD_BAR, original -> wrap(HudElementType.FOOD, original, StatusBars::food));
 		HudElementRegistry.replaceElement(VanillaHudElements.AIR_BAR, original -> wrap(HudElementType.AIR, original, StatusBars::air));

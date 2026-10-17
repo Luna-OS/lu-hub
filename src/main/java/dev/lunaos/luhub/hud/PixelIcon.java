@@ -46,6 +46,18 @@ public final class PixelIcon {
 		"..ooooo.."
 	);
 
+	public static final PixelIcon ARMOR = new PixelIcon(
+		".oo...oo.",
+		"ohoooooho",
+		"o#h###h#o",
+		"o#######o",
+		".o#####o.",
+		".o#####o.",
+		".o#####o.",
+		".o##h##o.",
+		"..ooooo.."
+	);
+
 	public final int width;
 	public final int height;
 	private final char[][] mask;

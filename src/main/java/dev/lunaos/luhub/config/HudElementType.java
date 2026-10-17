@@ -9,7 +9,7 @@ import net.minecraft.network.chat.Component;
 public enum HudElementType {
 	HOTBAR(182, 22, false, 0xFF969FEB),
 	HEALTH(81, 9, true, 0xFFF06BA8),
-	ARMOR(81, 9, false, 0xFFB9C0FF),
+	ARMOR(81, 9, true, 0xFFB9C0FF),
 	FOOD(81, 9, true, 0xFFFFC46B),
 	AIR(81, 9, true, 0xFF8FE3FF),
 	XP_BAR(182, 5, true, 0xFF9DF5C4),

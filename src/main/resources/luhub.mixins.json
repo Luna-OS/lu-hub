@@ -10,6 +10,7 @@
 		"FoodDataAccessor",
 		"GuiGraphicsExtractorMixin",
 		"HudAccessor",
+		"HudMixin",
 		"ImageButtonAccessor",
 		"ItemStackMixin",
 		"ScreenMixin",

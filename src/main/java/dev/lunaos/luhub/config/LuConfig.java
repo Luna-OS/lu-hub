@@ -34,6 +34,9 @@ public final class LuConfig {
 	/** Auch Container-Texturen anderer Mods einfärben (textures/gui/container/ in fremden Namespaces). */
 	public boolean themeModdedContainers = false;
 	public boolean themeHotbar = true;
+	/** Ausgewählten Hotbar-Slot hell hinterlegen. */
+	public boolean hotbarHighlight = true;
+	public int colorSelectedSlot = 0x70B9C0FF;
 	public boolean themeRecipeBook = true;
 	public boolean nightBackground = true;
 	public boolean moonDecoration = true;
@@ -90,6 +93,10 @@ public final class LuConfig {
 	public int debugNumberColor = 0xFFFFE08A;
 	public int debugHeaderColor = 0xFFFFB3E6;
 	public Map<String, DebugPanelConfig> debugPanels = new LinkedHashMap<>();
+
+	/** Für Einstellungs-Umstellungen zwischen Versionen. */
+	public int configVersion = 0;
+	private static final int CURRENT_VERSION = 2;
 
 	public static LuConfig get() {
 		return instance;
@@ -190,6 +197,15 @@ public final class LuConfig {
 			}
 			p.scale = Math.clamp(p.scale, 0.25f, 4f);
 		}
+		if (configVersion < 2) {
+			// Rüstung hat jetzt Themes: alte Einstellungen von "Vanilla" auf den Nachthimmel-Stil umstellen
+			HudElementConfig armor = hud(HudElementType.ARMOR);
+			if (armor.style == BarStyle.VANILLA) {
+				armor.style = BarStyle.NIGHT;
+				armor.fillColor = HudElementType.ARMOR.defaultFill;
+			}
+		}
+		configVersion = CURRENT_VERSION;
 		debugScale = Math.clamp(debugScale, 0.25f, 4f);
 		if (armorOrientation == null) {
 			armorOrientation = ArmorHudOrientation.HORIZONTAL;

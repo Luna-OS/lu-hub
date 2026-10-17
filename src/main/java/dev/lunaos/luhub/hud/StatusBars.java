@@ -110,6 +110,34 @@ public final class StatusBars {
 		return true;
 	}
 
+	// ------------------------------------------------------------------ Rüstung
+
+	public static boolean armor(GuiGraphicsExtractor graphics, DeltaTracker delta, HudElementConfig ec) {
+		Player player = player();
+		if (player == null) {
+			return true;
+		}
+		int armor = player.getArmorValue();
+		if (armor <= 0 && !LuHud.previewMode) {
+			return true;
+		}
+		if (armor <= 0) {
+			armor = 13; // Vorschau im HUD-Editor
+		}
+		// wie Vanilla: die Rüstungsleiste rutscht mit jeder weiteren Herzreihe nach oben
+		float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH), Mth.ceil(player.getHealth()));
+		int absorption = Mth.ceil(player.getAbsorptionAmount());
+		int rows = Mth.ceil((maxHealth + absorption) / 2.0F / 10.0F);
+		int rowHeight = Math.max(10 - (rows - 2), 3);
+		int baseX = HudElementType.ARMOR.defaultX(graphics.guiWidth());
+		int y = HudElementType.ARMOR.defaultY(graphics.guiHeight()) - (rows - 1) * rowHeight;
+		for (int i = 0; i < 10; i++) {
+			int fill = Math.clamp(armor - i * 2, 0, 2);
+			drawIcon(graphics, PixelIcon.ARMOR, baseX + i * 8, y, HudElementType.ARMOR, ec, i, fill, true, 0, false, false);
+		}
+		return true;
+	}
+
 	// ------------------------------------------------------------------ Hunger
 
 	public static boolean food(GuiGraphicsExtractor graphics, DeltaTracker delta, HudElementConfig ec) {
@@ -308,6 +336,7 @@ public final class StatusBars {
 			case HEALTH -> NightTheme.lerp(0xFFFF9BD2, 0xFFC2367F, t);
 			case FOOD -> NightTheme.lerp(0xFFFFE9A8, 0xFFE0963A, t);
 			case AIR -> NightTheme.lerp(0xE6D8F8FF, 0xE66AB8E6, t);
+			case ARMOR -> NightTheme.lerp(0xFFF0F2FF, 0xFF8A93D6, t);
 			default -> NightTheme.lerp(0xFFB49BFF, 0xFF6B4FD6, t);
 		};
 	}

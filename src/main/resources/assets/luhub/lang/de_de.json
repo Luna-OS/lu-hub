@@ -158,5 +158,7 @@
   "luhub.sort.inventory": "Inventar sortieren",
   "luhub.sort.quick_stack": "Einräumen (passende Items in die Kiste)",
   "luhub.sort.restock": "Auffüllen (passende Items ins Inventar)",
-  "luhub.config.food_health_preview": "Heilungs-Vorschau"
+  "luhub.config.food_health_preview": "Heilungs-Vorschau",
+  "luhub.config.hotbar_highlight": "Gewählten Slot aufhellen",
+  "luhub.config.color_selected_slot": "Gewählter Slot"
 }

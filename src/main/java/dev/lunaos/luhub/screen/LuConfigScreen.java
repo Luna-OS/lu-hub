@@ -285,6 +285,8 @@ public final class LuConfigScreen extends Screen {
 		toggle("luhub.config.theme_all_guis", c.themeAllGuis, v -> c.themeAllGuis = v, true);
 		toggle("luhub.config.shulker_colors", c.shulkerColors, v -> c.shulkerColors = v);
 		toggle("luhub.config.theme_hotbar", c.themeHotbar, v -> c.themeHotbar = v, true);
+		toggle("luhub.config.hotbar_highlight", c.hotbarHighlight, v -> c.hotbarHighlight = v);
+		color("luhub.config.color_selected_slot", () -> c.colorSelectedSlot, v -> c.colorSelectedSlot = v);
 		toggle("luhub.config.theme_recipe_book", c.themeRecipeBook, v -> c.themeRecipeBook = v, true);
 		toggle("luhub.config.theme_modded", c.themeModdedContainers, v -> c.themeModdedContainers = v, true);
 		toggle("luhub.config.night_background", c.nightBackground, v -> c.nightBackground = v);
