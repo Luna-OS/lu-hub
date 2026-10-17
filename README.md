@@ -12,9 +12,13 @@ und **Axo**, das Maskottchen, als animierter Rezeptbuch-Knopf im Inventar.
 |---|---|---|
 | ![HUD Trans](docs/hud-trans.png) | ![HUD Regenbogen](docs/hud-regenbogen.png) | ![F3](docs/f3.png) |
 
-| HUD-Editor | Farbwähler |
-|---|---|
-| ![HUD-Editor](docs/hud-editor.png) | ![Farbwähler](docs/farbwaehler.png) |
+| Rote Shulkerkiste | Grüne Shulkerkiste | Werkbank mit Axo |
+|---|---|---|
+| ![Shulker rot](docs/shulker-rot.png) | ![Shulker grün](docs/shulker-gruen.png) | ![Werkbank](docs/werkbank.png) |
+
+| Pausemenü | HUD-Editor | Farbwähler |
+|---|---|---|
+| ![Pausemenü](docs/pausemenue.png) | ![HUD-Editor](docs/hud-editor.png) | ![Farbwähler](docs/farbwaehler.png) |
 
 *(Screenshots aus dem automatischen Spieltest, mit REI installiert.)*
 
@@ -62,17 +66,22 @@ Außerdem: Klick auf den **Mond** oben rechts in jedem Inventar/Container öffne
 - Die **F3-Taste ist umbelegbar** (Einstellungen → F3 → „F3-Taste“), zusätzlich gibt es eine freie Zweittaste
 - Welche Einträge angezeigt werden, regelt weiterhin das Vanilla-Menü (F3 + F6), Mod-Einträge funktionieren automatisch
 
-### Nachthimmel-Theme für Inventar, Kisten, Öfen & Co.
+### Nachthimmel-Theme für jedes GUI
 - Alle Vanilla-Container (Inventar, Truhen, Öfen, Werkbank, Amboss, Braustand, Kreativ-Inventar …),
   die Inventarleiste und das Rezeptbuch werden beim Laden in Nachtblau mit Sternen umgefärbt –
-  farbige Teile wie Feuer oder Pfeile bleiben erhalten
-- Funkelnder Sternenhimmel mit Sternschnuppen hinter geöffneten Inventaren, Mond oben rechts
+  farbige Teile wie Feuer, Pfeile oder Buchseiten bleiben erhalten
+- Auch alle Menüs: Knöpfe, Regler, Checkboxen, Tooltips, Toasts, Fortschritte-Fenster, Statistiken,
+  Pausemenü, Optionen, Weltauswahl … (abschaltbar über „Alle Menüs & Knöpfe“)
+- **Shulkerkisten** bekommen ein GUI in ihrer eigenen Farbe – im Nachthimmel-Stil mit Sternen und Lichtkanten
+  (ungefärbte Shulker nutzen das normale Theme)
+- Funkelnder Sternenhimmel mit Sternschnuppen als Hintergrund aller Menüs, Mond oben rechts in Containern
 - Alle Farben (Hintergrund, Slots, Kanten, Sterne, Überschriften, Mond, Himmel) einstellbar,
   optional auch für Container anderer Mods
 - Weil die Texturen aus den aktuell geladenen Originalen erzeugt werden, funktionieren Resource-Packs darunter weiter
 
 ### Axo
-- Axo ersetzt das grüne Rezeptbuch im Inventar – der Knopf öffnet das Rezeptbuch weiterhin
+- Axo ersetzt überall das grüne Rezeptbuch: Inventar, Werkbank, Ofen, Räucherofen, Schmelzofen
+  und im Tutorial-Hinweis – der Knopf öffnet das Rezeptbuch weiterhin (Option „Nur im Inventar“)
 - Animation: wackelnde Kiemen, Blinzeln, leichtes Schweben; beim Drüberfahren hüpft Axo,
   wedelt mit dem Schwanz und es steigen Herzchen auf
 - Wenn REI das Rezeptbuch ausblendet, bleibt Axo trotzdem an seinem Platz
@@ -80,8 +89,8 @@ Außerdem: Klick auf den **Mond** oben rechts in jedem Inventar/Container öffne
   und kann per Resource-Pack ersetzt werden
 
 ### REI
-Lu Hub ändert nur Vanilla-Texturen, Überschriften-Farben und den Hintergrund hinter Containern –
-das REI-Overlay, die REI-Suche und REI-Rezeptansichten bleiben unberührt. Lu-Hub-Tasten werden nur im Spiel
+Lu Hub ändert nur Vanilla-Texturen, Überschriften-Farben und Menü-Hintergründe – REI funktioniert ganz normal
+(die REI-Knöpfe nutzen die Vanilla-Knopf-Texturen und passen sich deshalb automatisch dem Theme an). Lu-Hub-Tasten werden nur im Spiel
 (ohne offenes Menü) ausgewertet und stören die REI-Suche daher nicht.
 
 ## Konfiguration

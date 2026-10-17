@@ -11,7 +11,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Färbt GUI-Sprites (Slots, Hotbar, Rezeptbuch ...) beim Laden ins Nachthimmel-Theme um. */
+/** Färbt GUI-Sprites (Slots, Knöpfe, Tooltips, Hotbar, Rezeptbuch ...) beim Laden ins Nachthimmel-Theme um. */
 @Mixin(SpriteContents.class)
 public abstract class SpriteContentsMixin {
 	@Shadow
@@ -27,8 +27,9 @@ public abstract class SpriteContentsMixin {
 		at = @At("RETURN")
 	)
 	private void luhub$themeSprite(CallbackInfo ci) {
-		if (NightTheme.shouldThemeSprite(this.name)) {
-			NightTheme.apply(this.originalImage, this.name);
+		NightTheme.Kind kind = NightTheme.spriteKind(this.name);
+		if (kind != null) {
+			NightTheme.apply(this.originalImage, this.name, kind);
 		}
 	}
 }

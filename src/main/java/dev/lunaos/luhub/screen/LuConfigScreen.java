@@ -280,6 +280,8 @@ public final class LuConfigScreen extends Screen {
 	private void buildTheme() {
 		LuConfig c = LuConfig.get();
 		toggle("luhub.config.theme_enabled", c.themeEnabled, v -> c.themeEnabled = v, true);
+		toggle("luhub.config.theme_all_guis", c.themeAllGuis, v -> c.themeAllGuis = v, true);
+		toggle("luhub.config.shulker_colors", c.shulkerColors, v -> c.shulkerColors = v);
 		toggle("luhub.config.theme_hotbar", c.themeHotbar, v -> c.themeHotbar = v, true);
 		toggle("luhub.config.theme_recipe_book", c.themeRecipeBook, v -> c.themeRecipeBook = v, true);
 		toggle("luhub.config.theme_modded", c.themeModdedContainers, v -> c.themeModdedContainers = v, true);
@@ -310,7 +312,7 @@ public final class LuConfigScreen extends Screen {
 	private void buildAxo() {
 		LuConfig c = LuConfig.get();
 		toggle("luhub.config.axo_enabled", c.axoEnabled, v -> c.axoEnabled = v);
-		toggle("luhub.config.axo_everywhere", c.axoEverywhere, v -> c.axoEverywhere = v);
+		toggle("luhub.config.axo_only_inventory", c.axoOnlyInventory, v -> c.axoOnlyInventory = v);
 		toggle("luhub.config.axo_animated", c.axoAnimated, v -> c.axoAnimated = v);
 	}
 

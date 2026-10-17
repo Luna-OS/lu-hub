@@ -27,6 +27,10 @@ public final class LuConfig {
 
 	// ---------- Nachthimmel-Theme (Inventar, Kisten, Öfen, Hotbar ...) ----------
 	public boolean themeEnabled = true;
+	/** Theme auch für Menüs, Knöpfe, Tooltips, Toasts, Fortschritte – nicht nur für Container. */
+	public boolean themeAllGuis = true;
+	/** Shulkerkisten-GUI in der Farbe der Shulkerkiste (im Theme-Stil). */
+	public boolean shulkerColors = true;
 	/** Auch Container-Texturen anderer Mods einfärben (textures/gui/container/ in fremden Namespaces). */
 	public boolean themeModdedContainers = false;
 	public boolean themeHotbar = true;
@@ -48,8 +52,8 @@ public final class LuConfig {
 
 	// ---------- Axo ----------
 	public boolean axoEnabled = true;
-	/** Axo auch in Werkbank, Ofen usw. statt nur im Spieler-Inventar. */
-	public boolean axoEverywhere = false;
+	/** Axo nur im Spieler-Inventar statt überall, wo das grüne Rezeptbuch ist. */
+	public boolean axoOnlyInventory = false;
 	public boolean axoAnimated = true;
 
 	// ---------- HUD ----------

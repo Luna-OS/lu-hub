@@ -12,7 +12,11 @@ import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.gui.screens.PauseScreen;
+import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.CraftingScreen;
+import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
 import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
@@ -84,6 +88,32 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.takeScreenshot("luhub-13-furnace");
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 			context.waitTicks(5);
+
+			world.getServer().runCommand("setblock 0 -60 2 minecraft:red_shulker_box{Items:[{Slot:0b,id:\"minecraft:cake\",count:1},"
+				+ "{Slot:10b,id:\"minecraft:axolotl_bucket\",count:1}]}");
+			world.getServer().runCommand("setblock 0 -60 -2 minecraft:lime_shulker_box{Items:[{Slot:4b,id:\"minecraft:emerald\",count:20}]}");
+			world.getServer().runCommand("setblock 2 -60 2 minecraft:crafting_table");
+			context.waitTicks(10);
+			openContainer(context, new BlockPos(0, -60, 2), ShulkerBoxScreen.class);
+			context.takeScreenshot("luhub-14-shulker-red");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(0, -60, -2), ShulkerBoxScreen.class);
+			context.takeScreenshot("luhub-15-shulker-lime");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(2, -60, 2), CraftingScreen.class);
+			context.takeScreenshot("luhub-16-crafting-axo");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+
+			context.setScreen(() -> new PauseScreen(true));
+			context.waitTicks(5);
+			context.takeScreenshot("luhub-17-pause");
+			context.setScreen(() -> new AdvancementsScreen(context.computeOnClient(mc -> mc.player.connection.getAdvancements())));
+			context.waitTicks(5);
+			context.takeScreenshot("luhub-18-advancements");
+			context.setScreen(() -> null);
 
 			world.getServer().runCommand("setblock ~ ~ ~ minecraft:water");
 			world.getServer().runCommand("setblock ~ ~1 ~ minecraft:water");

@@ -2,7 +2,9 @@ package dev.lunaos.luhub.axo;
 
 import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.theme.NightTheme;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.resources.Identifier;
 import net.minecraft.util.ARGB;
@@ -10,7 +12,7 @@ import net.minecraft.util.Util;
 import org.joml.Matrix3x2fStack;
 
 /**
- * Zeichnet Axo, das Maskottchen, anstelle des grünen Rezeptbuch-Knopfes.
+ * Zeichnet Axo, das Maskottchen, überall dort, wo sonst das grüne Rezeptbuch ist.
  * <p>
  * Sprite-Sheet assets/luhub/textures/gui/axo.png: 5 Bilder à 28x19 Pixel
  * (0/1 = Ruhe mit wackelnden Kiemen, 2 = Blinzeln, 3/4 = fröhlich mit Schwanzwedeln beim Drüberfahren).
@@ -23,6 +25,32 @@ public final class AxoRenderer {
 	private static final int FRAMES = 5;
 
 	private AxoRenderer() {
+	}
+
+	private static final Identifier BOOK_BUTTON = Identifier.withDefaultNamespace("recipe_book/button");
+	private static final Identifier BOOK_BUTTON_HIGHLIGHTED = Identifier.withDefaultNamespace("recipe_book/button_highlighted");
+	private static final Identifier BOOK_TOAST = Identifier.withDefaultNamespace("toast/recipe_book");
+
+	/**
+	 * Ersetzt die Sprites des grünen Rezeptbuchs (Knopf in Inventar, Werkbank, Öfen ... und das Tutorial-Toast) durch Axo.
+	 *
+	 * @return true, wenn Axo gezeichnet wurde und das Original-Sprite entfallen soll
+	 */
+	public static boolean replaceBookSprite(GuiGraphicsExtractor graphics, Identifier sprite, int x, int y, int width, int height) {
+		boolean button = sprite.equals(BOOK_BUTTON);
+		boolean hovered = sprite.equals(BOOK_BUTTON_HIGHLIGHTED);
+		if (!button && !hovered && !sprite.equals(BOOK_TOAST)) {
+			return false;
+		}
+		LuConfig config = LuConfig.get();
+		if (!config.axoEnabled) {
+			return false;
+		}
+		if (config.axoOnlyInventory && !(Minecraft.getInstance().gui.screen() instanceof InventoryScreen)) {
+			return false;
+		}
+		extract(graphics, x + (width - FRAME_WIDTH) / 2, y + (height - FRAME_HEIGHT) / 2, hovered, true);
+		return true;
 	}
 
 	/** Zeichnet Axo mittig über einem 20x18 großen Knopf an (buttonX, buttonY). */

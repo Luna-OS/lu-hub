@@ -5,12 +5,13 @@
 	"client": [
 		"AbstractContainerScreenAccessor",
 		"AbstractContainerScreenMixin",
+		"AdvancementsScreenMixin",
 		"DebugScreenOverlayMixin",
 		"GuiGraphicsExtractorMixin",
 		"HudAccessor",
 		"ImageButtonAccessor",
-		"ImageButtonMixin",
 		"ScreenMixin",
+		"ShulkerBoxScreenMixin",
 		"SpriteContentsMixin",
 		"TextureContentsMixin"
 	],

@@ -60,9 +60,8 @@
   "luhub.config.color_sky_bottom": "Sky bottom",
   "luhub.config.reset_colors": "Default colors",
   "luhub.config.reload_hint": "Textures reload when you close this screen",
-  "luhub.config.axo_everywhere": "Also in crafting table, furnace ...",
   "luhub.config.axo_animated": "Animation",
-  "luhub.config.axo_hint": "Axo replaces the green recipe book – clicking still opens it",
+  "luhub.config.axo_hint": "Axo replaces the green recipe book everywhere – clicking still opens it",
   "luhub.color.new": "New",
   "luhub.color.old": "Old",
   "luhub.moon.tooltip": "Lu Hub settings",
@@ -126,5 +125,8 @@
   "luhub.debug.sound_cache": "Sound cache",
   "luhub.debug.post_effects": "Effects",
   "luhub.debug.gpu_utilization": "GPU",
-  "luhub.debug.simple_performance_impactors": "Performance"
+  "luhub.debug.simple_performance_impactors": "Performance",
+  "luhub.config.theme_all_guis": "All menus & buttons",
+  "luhub.config.shulker_colors": "Shulkers in their color",
+  "luhub.config.axo_only_inventory": "Only in inventory"
 }

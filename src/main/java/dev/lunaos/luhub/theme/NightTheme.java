@@ -4,69 +4,158 @@ import com.mojang.blaze3d.platform.NativeImage;
 import dev.lunaos.luhub.config.LuConfig;
 import net.minecraft.resources.Identifier;
 
+import java.util.Set;
+
 /**
  * Färbt Vanilla-GUI-Texturen beim Laden in das Nachthimmel-Theme um.
  * <p>
- * Die grauen Vanilla-Töne (Hintergrund #C6C6C6, Slots #8B8B8B, Kanten #FFFFFF/#555555/#373737, Rand #000000)
- * werden auf die Theme-Palette abgebildet, auf freien Hintergrund-Pixeln werden Sterne verteilt.
- * Farbige Pixel (Feuer, Pfeile, Tränke ...) bleiben unverändert. Weil die Texturen erst im Spiel
+ * Die grauen Vanilla-Töne (Hintergrund #C6C6C6, Slots #8B8B8B, Kanten #FFFFFF/#555555/#373737, Rand #000000,
+ * Knöpfe #6F6F6F ...) werden auf die Theme-Palette abgebildet, auf freien Hintergrund-Pixeln werden Sterne verteilt.
+ * Farbige Pixel (Feuer, Pfeile, Buchseiten ...) bleiben unverändert. Weil die Texturen erst im Spiel
  * aus den Original-Ressourcen erzeugt werden, funktionieren auch Resource-Packs darunter weiter.
  */
 public final class NightTheme {
 	private static final int VANILLA_BACKGROUND = 0xC6C6C6;
 
+	/** Sprite-Ordner, die wie Container-Fenster aussehen (heller Hintergrund, eingelassene Slots). */
+	private static final Set<String> PANEL_SPRITES = Set.of("container/", "recipe_book/", "advancements/", "statistics/");
+	/** Sprite-Ordner mit Knöpfen, Reglern, Tooltips, Toasts ... */
+	private static final Set<String> WIDGET_SPRITES = Set.of("widget/", "dialog/", "toast/", "popup/", "tooltip/",
+		"gamemode_switcher/", "spectator/", "transferable_list/");
+	/** Texturen, die farbig/aus Holz/Papier sind oder Logos – bleiben wie sie sind. */
+	private static final Set<String> TEXTURE_EXCLUDES = Set.of("textures/gui/book.png", "textures/gui/title/",
+		"textures/gui/signs/", "textures/gui/hanging_signs/", "textures/gui/presets/", "textures/gui/advancements/backgrounds/",
+		"textures/gui/realms/");
+
+	/** Wird bei jedem Neuladen von Theme-Texturen erhöht – davon abgeleitete Texturen bauen sich dann neu. */
+	public static volatile int generation;
+
 	private NightTheme() {
 	}
 
+	/** Wie ein Bild umgefärbt wird. */
+	public enum Kind {
+		/** Fenster mit Slots: Hintergrund #C6C6C6, Slots #8B8B8B. */
+		PANEL(new int[]{0, 55, 85, 139, 198, 255}),
+		/** Knöpfe &amp; Co.: Knopf #6F6F6F, deaktiviert #2C2C2C, helle Kante #A0A0A0. */
+		WIDGET(new int[]{0, 44, 85, 111, 165, 255});
+
+		final int[] grays;
+
+		Kind(int[] grays) {
+			this.grays = grays;
+		}
+	}
+
+	/** Die Farben, auf die die Vanilla-Grautöne abgebildet werden. */
+	public record Palette(int border, int shadow, int slot, int background, int highlight, int star) {
+		public static Palette fromConfig() {
+			LuConfig c = LuConfig.get();
+			return new Palette(c.colorBorder, c.colorShadow, c.colorSlot, c.colorBackground, c.colorHighlight, c.colorStar);
+		}
+
+		/** Theme-Palette, eingefärbt in der Farbe einer Shulkerkiste (oder jeder anderen Farbe). */
+		public static Palette tinted(int rgb) {
+			LuConfig c = LuConfig.get();
+			int dye = 0xFF000000 | rgb;
+			int background = lerp(darken(dye, 0.35f), c.colorBackground, 0.3f);
+			return new Palette(darken(dye, 0.88f), darken(background, 0.6f), darken(background, 0.45f), background,
+				lerp(dye, 0xFFFFFFFF, 0.5f), c.colorStar);
+		}
+
+		int[] colors(Kind kind) {
+			return switch (kind) {
+				case PANEL -> new int[]{border, shadow, lerp(shadow, slot, 0.6f), slot, background, highlight};
+				case WIDGET -> new int[]{border, darken(background, 0.45f), lerp(shadow, background, 0.5f), background,
+					lerp(background, highlight, 0.45f), highlight};
+			};
+		}
+	}
+
+	private static boolean allGuis() {
+		return LuConfig.get().themeAllGuis;
+	}
+
 	/** Soll eine eigenständige Textur (z.B. textures/gui/container/furnace.png) umgefärbt werden? */
-	public static boolean shouldThemeTexture(Identifier id) {
+	public static Kind textureKind(Identifier id) {
 		LuConfig c = LuConfig.get();
 		if (!c.themeEnabled) {
-			return false;
+			return null;
 		}
 		String path = id.getPath();
 		boolean vanilla = id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
 		if (path.startsWith("textures/gui/container/")) {
-			return vanilla || c.themeModdedContainers;
+			return vanilla || c.themeModdedContainers ? Kind.PANEL : null;
 		}
-		return vanilla && c.themeRecipeBook && path.equals("textures/gui/recipe_book.png");
+		if (!vanilla || !path.startsWith("textures/gui/") || path.startsWith("textures/gui/sprites/")) {
+			return null;
+		}
+		if (path.equals("textures/gui/recipe_book.png")) {
+			return c.themeRecipeBook ? Kind.PANEL : null;
+		}
+		if (!allGuis()) {
+			return null;
+		}
+		for (String exclude : TEXTURE_EXCLUDES) {
+			if (path.startsWith(exclude)) {
+				return null;
+			}
+		}
+		return Kind.PANEL;
 	}
 
-	/** Soll ein Sprite aus dem GUI-Atlas (z.B. container/slot/sword, hud/hotbar) umgefärbt werden? */
-	public static boolean shouldThemeSprite(Identifier id) {
+	/** Soll ein Sprite aus dem GUI-Atlas (z.B. container/slot/sword, widget/button) umgefärbt werden? */
+	public static Kind spriteKind(Identifier id) {
 		LuConfig c = LuConfig.get();
 		if (!c.themeEnabled) {
-			return false;
+			return null;
 		}
 		String path = id.getPath();
 		boolean vanilla = id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
 		if (path.startsWith("container/")) {
-			return vanilla || c.themeModdedContainers;
+			return vanilla || c.themeModdedContainers ? Kind.PANEL : null;
 		}
 		if (!vanilla) {
-			return false;
+			return null;
 		}
 		if (path.startsWith("hud/hotbar")) {
-			return c.themeHotbar;
+			return c.themeHotbar ? Kind.PANEL : null;
 		}
-		return c.themeRecipeBook && path.startsWith("recipe_book/");
+		if (path.startsWith("recipe_book/")) {
+			return c.themeRecipeBook ? Kind.PANEL : null;
+		}
+		if (!allGuis()) {
+			return null;
+		}
+		for (String prefix : PANEL_SPRITES) {
+			if (path.startsWith(prefix)) {
+				return Kind.PANEL;
+			}
+		}
+		for (String prefix : WIDGET_SPRITES) {
+			if (path.startsWith(prefix)) {
+				return Kind.WIDGET;
+			}
+		}
+		return null;
 	}
 
-	public static void apply(NativeImage image, Identifier id) {
+	public static void apply(NativeImage image, Identifier id, Kind kind) {
+		apply(image, id.hashCode(), kind, Palette.fromConfig());
+	}
+
+	public static void apply(NativeImage image, int seed, Kind kind, Palette palette) {
 		if (image.format() != NativeImage.Format.RGBA) {
 			return;
 		}
 		LuConfig c = LuConfig.get();
-		int[] anchorsGray = {0, 55, 85, 139, 198, 255};
-		int[] anchorsColor = {c.colorBorder, c.colorShadow, c.colorShadow, c.colorSlot, c.colorBackground, c.colorHighlight};
-		// Die dunkle Kante (#555555) etwas heller als der Slot-Schatten (#373737), damit die 3D-Optik bleibt
-		anchorsColor[2] = lerp(c.colorShadow, c.colorSlot, 0.6f);
+		int[] grays = kind.grays;
+		int[] colors = palette.colors(kind);
 
-		int seed = id.hashCode();
 		boolean stars = c.stars && c.starDensity > 0;
 		float density = c.starDensity;
-		int dimStar = lerp(c.colorBackground, c.colorHighlight, 0.45f);
-		int faintStar = lerp(c.colorBackground, c.colorHighlight, 0.15f);
+		int dimStar = lerp(palette.background(), palette.highlight(), 0.45f);
+		int faintStar = lerp(palette.background(), palette.highlight(), 0.15f);
 
 		for (int y = 0; y < image.getHeight(); y++) {
 			for (int x = 0; x < image.getWidth(); x++) {
@@ -85,20 +174,25 @@ public final class NightTheme {
 				if (!grayish) {
 					continue;
 				}
-				int color = mapGray(lum, anchorsGray, anchorsColor);
-				if (stars && (argb & 0xFFFFFF) == VANILLA_BACKGROUND) {
+				int color = mapGray(lum, grays, colors);
+				if (stars && a == 0xFF && isStarGround(kind, argb & 0xFFFFFF, lum)) {
 					float v = hash(x, y, seed);
-					if (v < 0.006f * density) {
-						color = c.colorStar;
-					} else if (v < 0.016f * density) {
+					float scale = kind == Kind.WIDGET ? 0.35f : 1f;
+					if (v < 0.006f * density * scale) {
+						color = palette.star();
+					} else if (v < 0.016f * density * scale) {
 						color = dimStar;
-					} else if (v < 0.032f * density) {
+					} else if (v < 0.032f * density * scale) {
 						color = faintStar;
 					}
 				}
 				image.setPixel(x, y, (a << 24) | (color & 0xFFFFFF));
 			}
 		}
+	}
+
+	private static boolean isStarGround(Kind kind, int rgb, int lum) {
+		return kind == Kind.PANEL ? rgb == VANILLA_BACKGROUND : lum >= 105 && lum <= 117;
 	}
 
 	private static int mapGray(int gray, int[] grays, int[] colors) {
@@ -117,6 +211,10 @@ public final class NightTheme {
 		int g = (int) (((c0 >> 8) & 0xFF) + (((c1 >> 8) & 0xFF) - ((c0 >> 8) & 0xFF)) * t);
 		int b = (int) ((c0 & 0xFF) + ((c1 & 0xFF) - (c0 & 0xFF)) * t);
 		return (a << 24) | (r << 16) | (g << 8) | b;
+	}
+
+	public static int darken(int color, float amount) {
+		return lerp(color, color & 0xFF000000, amount);
 	}
 
 	/** Deterministisches Rauschen in [0, 1) – gleiche Sterne bei jedem Laden. */

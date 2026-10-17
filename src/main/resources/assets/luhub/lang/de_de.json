@@ -60,9 +60,8 @@
   "luhub.config.color_sky_bottom": "Himmel unten",
   "luhub.config.reset_colors": "Standardfarben",
   "luhub.config.reload_hint": "Texturen werden beim Schließen neu geladen",
-  "luhub.config.axo_everywhere": "Auch in Werkbank, Ofen ...",
   "luhub.config.axo_animated": "Animation",
-  "luhub.config.axo_hint": "Axo ersetzt das grüne Rezeptbuch – Klick öffnet es weiterhin",
+  "luhub.config.axo_hint": "Axo ersetzt überall das grüne Rezeptbuch – Klick öffnet es weiterhin",
   "luhub.color.new": "Neu",
   "luhub.color.old": "Alt",
   "luhub.moon.tooltip": "Lu-Hub-Einstellungen",
@@ -126,5 +125,8 @@
   "luhub.debug.sound_cache": "Sound-Cache",
   "luhub.debug.post_effects": "Effekte",
   "luhub.debug.gpu_utilization": "GPU",
-  "luhub.debug.simple_performance_impactors": "Leistung"
+  "luhub.debug.simple_performance_impactors": "Leistung",
+  "luhub.config.theme_all_guis": "Alle Menüs & Knöpfe",
+  "luhub.config.shulker_colors": "Shulker in ihrer Farbe",
+  "luhub.config.axo_only_inventory": "Nur im Inventar"
 }

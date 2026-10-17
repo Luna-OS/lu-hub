@@ -7,13 +7,20 @@ public final class ThemeLabels {
 	private static final int VANILLA_LABEL = 0xFF404040;
 	/** true, während ein Container-Screen seine Überschriften zeichnet. */
 	public static boolean active;
+	/** Abweichende Überschriften-Farbe für den aktuellen Screen (0 = Theme-Farbe). */
+	public static int override;
 
 	private ThemeLabels() {
 	}
 
+	public static boolean allGuis() {
+		LuConfig c = LuConfig.get();
+		return c.themeEnabled && c.themeAllGuis;
+	}
+
 	public static int recolor(int color) {
 		if (active && color == VANILLA_LABEL && LuConfig.get().themeEnabled) {
-			return LuConfig.get().colorLabel;
+			return override != 0 ? override : LuConfig.get().colorLabel;
 		}
 		return color;
 	}

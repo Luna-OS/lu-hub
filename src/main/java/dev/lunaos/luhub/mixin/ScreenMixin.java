@@ -10,14 +10,25 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Sternenhimmel statt grauem Schleier hinter Inventar, Truhen, Öfen usw. */
+/** Sternenhimmel statt grauem Schleier hinter Inventar, Truhen, Öfen, Pausemenü, Optionen usw. */
 @Mixin(Screen.class)
 public abstract class ScreenMixin {
 	@Inject(method = "extractTransparentBackground", at = @At("HEAD"), cancellable = true)
 	private void luhub$nightSky(GuiGraphicsExtractor graphics, CallbackInfo ci) {
 		LuConfig config = LuConfig.get();
 		Screen self = (Screen) (Object) this;
-		if (config.themeEnabled && config.nightBackground && self instanceof AbstractContainerScreen) {
+		if (config.themeEnabled && config.nightBackground && (config.themeAllGuis || self instanceof AbstractContainerScreen)) {
+			ThemeDecor.extractNightSky(graphics, self.width, self.height);
+			ci.cancel();
+		}
+	}
+
+	/** Auch Pausemenü, Optionen, Weltauswahl usw. bekommen den Sternenhimmel als Hintergrund. */
+	@Inject(method = "extractMenuBackground(Lnet/minecraft/client/gui/GuiGraphicsExtractor;)V", at = @At("HEAD"), cancellable = true)
+	private void luhub$nightSkyMenu(GuiGraphicsExtractor graphics, CallbackInfo ci) {
+		LuConfig config = LuConfig.get();
+		if (config.themeEnabled && config.themeAllGuis && config.nightBackground) {
+			Screen self = (Screen) (Object) this;
 			ThemeDecor.extractNightSky(graphics, self.width, self.height);
 			ci.cancel();
 		}
