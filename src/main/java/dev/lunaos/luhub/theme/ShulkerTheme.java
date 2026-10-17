@@ -7,7 +7,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.packs.resources.Resource;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.ShulkerBoxBlock;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
@@ -31,16 +35,51 @@ public final class ShulkerTheme {
 	private ShulkerTheme() {
 	}
 
-	/** Farbe (RGB) der Shulkerkiste, auf die der Spieler gerade schaut – oder null bei ungefärbten Kisten. */
-	public static Integer targetedColor() {
+	/**
+	 * Farbe (RGB) der geöffneten Shulkerkiste – oder null bei ungefärbten Kisten.
+	 * Reihenfolge: Fenstertitel ("Rote Shulkerkiste"), angeschauter Block, Shulkerkiste in der Hand
+	 * (für Mods/Server, die Shulker direkt aus dem Inventar öffnen).
+	 */
+	public static Integer colorFor(Component title) {
+		DyeColor color = fromTitle(title);
+		if (color == null) {
+			color = fromTargetedBlock();
+		}
+		if (color == null) {
+			color = fromHeldItem();
+		}
+		return color == null ? null : color.getTextureDiffuseColor() & 0xFFFFFF;
+	}
+
+	private static DyeColor fromTitle(Component title) {
+		if (title != null && title.getContents() instanceof TranslatableContents t) {
+			String key = t.getKey();
+			if (key.startsWith("block.minecraft.") && key.endsWith("_shulker_box")) {
+				String name = key.substring("block.minecraft.".length(), key.length() - "_shulker_box".length());
+				return DyeColor.byName(name, null);
+			}
+		}
+		return null;
+	}
+
+	private static DyeColor fromTargetedBlock() {
 		Minecraft mc = Minecraft.getInstance();
 		HitResult hit = mc.hitResult;
 		if (mc.level == null || !(hit instanceof BlockHitResult blockHit) || hit.getType() != HitResult.Type.BLOCK) {
 			return null;
 		}
-		if (mc.level.getBlockState(blockHit.getBlockPos()).getBlock() instanceof ShulkerBoxBlock shulker) {
-			DyeColor color = shulker.getColor();
-			return color == null ? null : color.getTextureDiffuseColor() & 0xFFFFFF;
+		return mc.level.getBlockState(blockHit.getBlockPos()).getBlock() instanceof ShulkerBoxBlock shulker ? shulker.getColor() : null;
+	}
+
+	private static DyeColor fromHeldItem() {
+		Minecraft mc = Minecraft.getInstance();
+		if (mc.player == null) {
+			return null;
+		}
+		for (ItemStack stack : new ItemStack[]{mc.player.getMainHandItem(), mc.player.getOffhandItem()}) {
+			if (stack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock shulker) {
+				return shulker.getColor();
+			}
 		}
 		return null;
 	}

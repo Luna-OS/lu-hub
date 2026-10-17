@@ -25,7 +25,7 @@ public abstract class ShulkerBoxScreenMixin implements ThemedLabelScreen {
 
 	@Inject(method = "<init>", at = @At("RETURN"))
 	private void luhub$rememberColor(ShulkerBoxMenu menu, Inventory inventory, Component title, CallbackInfo ci) {
-		this.luhub$color = ShulkerTheme.targetedColor();
+		this.luhub$color = ShulkerTheme.colorFor(title);
 	}
 
 	@WrapOperation(

@@ -317,10 +317,11 @@ public final class LuConfigScreen extends Screen {
 		LuConfig c = LuConfig.get();
 		// Hunger-Infos (wie AppleSkin)
 		toggle("luhub.config.food_tooltip", c.foodTooltip, v -> c.foodTooltip = v).active = !ExternalMods.APPLESKIN;
-		toggle("luhub.config.food_saturation", c.foodSaturationOverlay, v -> c.foodSaturationOverlay = v).active = !ExternalMods.APPLESKIN;
-		toggle("luhub.config.food_exhaustion", c.foodExhaustionUnderlay, v -> c.foodExhaustionUnderlay = v).active = !ExternalMods.APPLESKIN;
-		toggle("luhub.config.food_preview", c.foodHeldPreview, v -> c.foodHeldPreview = v).active = !ExternalMods.APPLESKIN;
-		toggle("luhub.config.food_health_preview", c.foodHealthPreview, v -> c.foodHealthPreview = v).active = !ExternalMods.APPLESKIN;
+		// HUD-Anzeigen bleiben auch mit AppleSkin aktiv – sie greifen dann bei den Lu-Hub-Stilen
+		toggle("luhub.config.food_saturation", c.foodSaturationOverlay, v -> c.foodSaturationOverlay = v);
+		toggle("luhub.config.food_exhaustion", c.foodExhaustionUnderlay, v -> c.foodExhaustionUnderlay = v);
+		toggle("luhub.config.food_preview", c.foodHeldPreview, v -> c.foodHeldPreview = v);
+		toggle("luhub.config.food_health_preview", c.foodHealthPreview, v -> c.foodHealthPreview = v);
 		// Shulker-Vorschau (wie Shulker Box Tooltip)
 		toggle("luhub.config.shulker_preview", c.shulkerPreview, v -> c.shulkerPreview = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;
 		toggle("luhub.config.shulker_hide_lines", c.shulkerPreviewHideLines, v -> c.shulkerPreviewHideLines = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;

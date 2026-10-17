@@ -1,6 +1,7 @@
 package dev.lunaos.luhub.food;
 
 import dev.lunaos.luhub.compat.ExternalMods;
+import dev.lunaos.luhub.config.BarStyle;
 import dev.lunaos.luhub.config.HudElementType;
 import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.hud.PixelIcon;
@@ -30,8 +31,21 @@ public final class FoodInfo {
 	private FoodInfo() {
 	}
 
+	/** Tooltip-Werte: nur ohne AppleSkin (sonst zeigt AppleSkin sie selbst). */
 	public static boolean active() {
 		return !ExternalMods.APPLESKIN;
+	}
+
+	/**
+	 * HUD-Anzeigen auf einer Leiste. AppleSkin kann nur auf die Vanilla-Leisten zeichnen – sobald ein Lu-Hub-Stil
+	 * (Nachthimmel, Pride, eigene Farben) aktiv ist, übernimmt Lu Hub auch bei installiertem AppleSkin.
+	 */
+	public static boolean activeFor(HudElementType type) {
+		if (!ExternalMods.APPLESKIN) {
+			return true;
+		}
+		LuConfig c = LuConfig.get();
+		return c.hudEnabled && c.hud(type).style != BarStyle.VANILLA;
 	}
 
 	/** Gehaltenes Essen (Haupt- oder Zweithand) oder null. */
@@ -45,13 +59,23 @@ public final class FoodInfo {
 		return null;
 	}
 
-	/** Erschöpfung des Spielers – nur im Einzelspieler bekannt, sonst 0. */
+	/**
+	 * Erschöpfung des Spielers. Sie wird normalerweise nicht an Clients geschickt: im Einzelspieler lesen wir sie
+	 * direkt vom Server, mit AppleSkin auf dem Server synchronisiert AppleSkin sie in die Client-Daten. Sonst 0.
+	 */
 	private static float exhaustion(Minecraft mc) {
-		if (mc.player == null || mc.getSingleplayerServer() == null) {
+		if (mc.player == null) {
 			return 0f;
 		}
-		ServerPlayer serverPlayer = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
-		return serverPlayer == null ? 0f : ((FoodDataAccessor) serverPlayer.getFoodData()).luhub$getExhaustionLevel();
+		if (mc.getSingleplayerServer() != null) {
+			ServerPlayer serverPlayer = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+			return serverPlayer == null ? 0f : ((FoodDataAccessor) serverPlayer.getFoodData()).luhub$getExhaustionLevel();
+		}
+		return ExternalMods.APPLESKIN ? ((FoodDataAccessor) mc.player.getFoodData()).luhub$getExhaustionLevel() : 0f;
+	}
+
+	private static boolean exhaustionKnown(Minecraft mc) {
+		return mc.getSingleplayerServer() != null || ExternalMods.APPLESKIN;
 	}
 
 	/**
@@ -95,7 +119,7 @@ public final class FoodInfo {
 		LuConfig c = LuConfig.get();
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
-		if (!active() || !c.foodHealthPreview || player == null) {
+		if (!activeFor(HudElementType.HEALTH) || !c.foodHealthPreview || player == null) {
 			return;
 		}
 		FoodProperties held = heldFood(player);
@@ -145,7 +169,7 @@ public final class FoodInfo {
 	public static void underlay(GuiGraphicsExtractor graphics) {
 		LuConfig c = LuConfig.get();
 		Minecraft mc = Minecraft.getInstance();
-		if (!active() || !c.foodExhaustionUnderlay || mc.player == null || mc.getSingleplayerServer() == null) {
+		if (!activeFor(HudElementType.FOOD) || !c.foodExhaustionUnderlay || mc.player == null || !exhaustionKnown(mc)) {
 			return;
 		}
 		// Erschöpfung wird nicht an Clients geschickt – im Einzelspieler lesen wir sie direkt vom Server
@@ -163,7 +187,7 @@ public final class FoodInfo {
 		LuConfig c = LuConfig.get();
 		Minecraft mc = Minecraft.getInstance();
 		Player player = mc.player;
-		if (!active() || player == null) {
+		if (!activeFor(HudElementType.FOOD) || player == null) {
 			return;
 		}
 		int right = HudElementType.FOOD.defaultX(graphics.guiWidth()) + 81;

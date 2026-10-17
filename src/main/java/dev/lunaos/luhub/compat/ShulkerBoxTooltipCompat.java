@@ -1,8 +1,15 @@
 package dev.lunaos.luhub.compat;
 
 import dev.lunaos.luhub.config.LuConfig;
+import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
 import dev.lunaos.luhub.theme.NightTheme;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.resources.Identifier;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.DyeColor;
+import net.minecraft.world.level.block.ShulkerBoxBlock;
 
 /**
  * Falls "Shulker Box Tooltip" installiert ist: dessen Vorschau-Fenster bekommt den Nachthimmel-Look
@@ -32,10 +39,30 @@ public final class ShulkerBoxTooltipCompat {
 		return new NightTheme.Palette(0xFF101010, 0xFF505050, 0xFF6E6E6E, 0xFF000000 | bg << 16 | bg << 8 | bg, 0xFFFFFFFF, 0xFFFFFFFF);
 	}
 
+	/** Farbe der gefärbten Shulkerkiste im Slot unter der Maus, sonst null. */
+	private static Integer hoveredShulkerColor() {
+		if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) {
+			return null;
+		}
+		Slot slot = ((AbstractContainerScreenAccessor) screen).luhub$getHoveredSlot();
+		if (slot == null || !(slot.getItem().getItem() instanceof BlockItem item) || !(item.getBlock() instanceof ShulkerBoxBlock shulker)) {
+			return null;
+		}
+		DyeColor dye = shulker.getColor();
+		return dye == null ? null : dye.getTextureDiffuseColor() & 0xFFFFFF;
+	}
+
 	/** Neue Multiplikationsfarbe für die von Shulker Box Tooltip übergebene Farbe. */
 	public static int tint(int color) {
 		LuConfig c = LuConfig.get();
 		int rgb = color & 0xFFFFFF;
+		if (rgb == DEFAULT_COLOR) {
+			// "Farben benutzen" ist in Shulker Box Tooltip aus – Farbe direkt von der Kiste unter der Maus holen
+			Integer hovered = hoveredShulkerColor();
+			if (hovered != null) {
+				rgb = hovered;
+			}
+		}
 		int background = rgb == DEFAULT_COLOR || rgb == UNDYED_SHULKER || !c.shulkerColors
 			? c.colorBackground
 			: NightTheme.Palette.tinted(rgb).background();
