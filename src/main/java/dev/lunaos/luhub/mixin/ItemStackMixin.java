@@ -15,6 +15,7 @@ import java.util.Optional;
 public abstract class ItemStackMixin {
 	@Inject(method = "getTooltipImage", at = @At("RETURN"), cancellable = true)
 	private void luhub$extraTooltip(CallbackInfoReturnable<Optional<TooltipComponent>> cir) {
+		LuTooltips.noteTooltipStack((ItemStack) (Object) this);
 		if (cir.getReturnValue().isEmpty()) {
 			Optional<TooltipComponent> extra = LuTooltips.extraImage((ItemStack) (Object) this);
 			if (extra.isPresent()) {

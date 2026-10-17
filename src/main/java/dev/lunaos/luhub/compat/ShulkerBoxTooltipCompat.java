@@ -2,6 +2,7 @@ package dev.lunaos.luhub.compat;
 
 import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
+import dev.lunaos.luhub.tooltip.LuTooltips;
 import dev.lunaos.luhub.theme.NightTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -58,7 +59,10 @@ public final class ShulkerBoxTooltipCompat {
 		int rgb = color & 0xFFFFFF;
 		if (rgb == DEFAULT_COLOR) {
 			// "Farben benutzen" ist in Shulker Box Tooltip aus – Farbe direkt von der Kiste unter der Maus holen
-			Integer hovered = hoveredShulkerColor();
+			Integer hovered = LuTooltips.currentShulkerColor();
+			if (hovered == null) {
+				hovered = hoveredShulkerColor();
+			}
 			if (hovered != null) {
 				rgb = hovered;
 			}

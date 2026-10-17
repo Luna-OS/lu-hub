@@ -3,6 +3,7 @@ package dev.lunaos.luhub.test;
 import dev.lunaos.luhub.config.BarStyle;
 import dev.lunaos.luhub.config.HudElementType;
 import dev.lunaos.luhub.config.LuConfig;
+import dev.lunaos.luhub.compat.ShulkerBoxTooltipCompat;
 import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
 import dev.lunaos.luhub.screen.ColorPickerScreen;
 import dev.lunaos.luhub.sort.Sorter;
@@ -69,6 +70,12 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.takeScreenshot("luhub-06-inventory");
 			hoverHotbarSlot(context, 3);
 			context.takeScreenshot("luhub-06b-shulker-tooltip");
+			// Shulker Box Tooltip ohne "farbige Vorschau" übergibt Weiß – Lu Hub muss trotzdem Rot erkennen
+			int themed = context.computeOnClient(mc -> ShulkerBoxTooltipCompat.tint(0xFFFFFFFF));
+			int red = context.computeOnClient(mc -> ShulkerBoxTooltipCompat.tint(0xFFB02E26));
+			if (themed != red) {
+				throw new AssertionError("Shulkerfarbe im Tooltip nicht erkannt: " + Integer.toHexString(themed) + " statt " + Integer.toHexString(red));
+			}
 			// Shulker Box Tooltip (falls installiert) zeigt die Vorschau erst mit Shift
 			context.getInput().holdShift();
 			context.waitTicks(3);

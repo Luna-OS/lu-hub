@@ -24,7 +24,28 @@ import java.util.Optional;
  * und eine Inhalts-Vorschau bei Shulkerkisten (wie Shulker Box Tooltip) – beides im Theme-Stil.
  */
 public final class LuTooltips {
+	/** Das Item, für das zuletzt ein Tooltip gebaut wurde (z.B. für die Farbe der Shulker-Box-Tooltip-Vorschau). */
+	private static ItemStack lastTooltipStack = ItemStack.EMPTY;
+	private static long lastTooltipFrame;
+
 	private LuTooltips() {
+	}
+
+	public static void noteTooltipStack(ItemStack stack) {
+		lastTooltipStack = stack;
+		lastTooltipFrame = net.minecraft.util.Util.getMillis();
+	}
+
+	/** Farbe (RGB) der gefärbten Shulkerkiste, deren Tooltip gerade gezeigt wird – sonst null. */
+	public static Integer currentShulkerColor() {
+		if (net.minecraft.util.Util.getMillis() - lastTooltipFrame > 250) {
+			return null; // veraltet
+		}
+		if (lastTooltipStack.getItem() instanceof BlockItem item && item.getBlock() instanceof ShulkerBoxBlock shulker) {
+			DyeColor dye = shulker.getColor();
+			return dye == null ? null : dye.getTextureDiffuseColor() & 0xFFFFFF;
+		}
+		return null;
 	}
 
 	public static void register() {
