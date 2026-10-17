@@ -40,14 +40,16 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			world.getServer().runCommand("item replace entity @a armor.chest with minecraft:iron_chestplate[minecraft:damage=200]");
 			world.getServer().runCommand("item replace entity @a armor.legs with minecraft:golden_leggings[minecraft:damage=100]");
 			world.getServer().runCommand("item replace entity @a armor.feet with minecraft:leather_boots[minecraft:damage=40]");
-			world.getServer().runCommand("item replace entity @a weapon.offhand with minecraft:bread 6");
+			world.getServer().runCommand("item replace entity @a weapon.offhand with minecraft:golden_apple 3");
 			world.getServer().runCommand("xp add @a 7 levels");
 			world.getServer().runCommand("xp add @a 40 points");
-			world.getServer().runCommand("damage @a 7");
+			world.getServer().runCommand("damage @p 7");
 			world.getServer().runCommand("effect give @a absorption 600 0 true");
-			world.getServer().runCommand("effect give @a hunger 3 200 true");
 			context.waitTicks(80);
 			context.takeScreenshot("luhub-01-hud-night");
+			world.getServer().runCommand("damage @p 9");
+			context.waitTicks(4);
+			context.takeScreenshot("luhub-01b-heal-preview");
 
 			setStyle(context, BarStyle.TRANS);
 			context.takeScreenshot("luhub-02-hud-trans");

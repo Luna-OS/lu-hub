@@ -10,7 +10,10 @@ import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ARGB;
+import net.minecraft.util.Mth;
 import net.minecraft.util.Util;
+import net.minecraft.world.Difficulty;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.ItemStack;
@@ -18,7 +21,7 @@ import net.minecraft.world.item.ItemStack;
 /**
  * Hunger-Infos wie bei AppleSkin, direkt in Lu Hub: Sättigung als goldener Rand um die Keulen,
  * Erschöpfung als Balken hinter der Hungerleiste (Einzelspieler) und eine blinkende Vorschau,
- * wie viel Hunger und Sättigung das gehaltene Essen bringt.
+ * wie viel Hunger, Sättigung und Leben das gehaltene Essen bringt.
  */
 public final class FoodInfo {
 	private static final int SATURATION = 0xFFFFD94A;
@@ -42,6 +45,102 @@ public final class FoodInfo {
 		return null;
 	}
 
+	/** Erschöpfung des Spielers – nur im Einzelspieler bekannt, sonst 0. */
+	private static float exhaustion(Minecraft mc) {
+		if (mc.player == null || mc.getSingleplayerServer() == null) {
+			return 0f;
+		}
+		ServerPlayer serverPlayer = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
+		return serverPlayer == null ? 0f : ((FoodDataAccessor) serverPlayer.getFoodData()).luhub$getExhaustionLevel();
+	}
+
+	/**
+	 * Wie viel Leben man durch natürliche Regeneration zurückbekommt, wenn man das Essen jetzt isst.
+	 * Spielt die Vanilla-Regeln nach: volle Hungerleiste + Sättigung heilt schnell, ab 18 Hunger langsam,
+	 * jede Heilung verbraucht Sättigung bzw. Hunger.
+	 */
+	public static float estimatedHeal(Player player, FoodProperties food) {
+		float max = player.getMaxHealth();
+		float health = player.getHealth();
+		int foodLevel = Math.min(20, player.getFoodData().getFoodLevel() + food.nutrition());
+		float saturation = Math.min(foodLevel, player.getFoodData().getSaturationLevel() + food.saturation());
+		float exhaustion = exhaustion(Minecraft.getInstance());
+		boolean peaceful = player.level().getDifficulty() == Difficulty.PEACEFUL;
+		float start = health;
+		for (int guard = 0; health < max && guard < 2000; guard++) {
+			if (saturation > 0 && foodLevel >= 20) {
+				float spent = Math.min(saturation, 6f);
+				health += spent / 6f;
+				exhaustion += spent;
+			} else if (foodLevel >= 18) {
+				health += 1f;
+				exhaustion += 6f;
+			} else {
+				break;
+			}
+			while (exhaustion > 4f) {
+				exhaustion -= 4f;
+				if (saturation > 0) {
+					saturation = Math.max(saturation - 1f, 0f);
+				} else if (!peaceful) {
+					foodLevel = Math.max(foodLevel - 1, 0);
+				}
+			}
+		}
+		return Math.min(health, max) - start;
+	}
+
+	/** Blinkende Herzen: so viel Leben würde das gehaltene Essen zurückbringen. */
+	public static void healthOverlay(GuiGraphicsExtractor graphics) {
+		LuConfig c = LuConfig.get();
+		Minecraft mc = Minecraft.getInstance();
+		Player player = mc.player;
+		if (!active() || !c.foodHealthPreview || player == null) {
+			return;
+		}
+		FoodProperties held = heldFood(player);
+		if (held == null || !player.canEat(held.canAlwaysEat())) {
+			return;
+		}
+		float gain = estimatedHeal(player, held);
+		if (gain < 0.5f) {
+			return;
+		}
+		float maxHealth = Math.max((float) player.getAttributeValue(Attributes.MAX_HEALTH), player.getHealth());
+		int absorption = Mth.ceil(player.getAbsorptionAmount());
+		int rows = Mth.ceil((maxHealth + absorption) / 2.0F / 10.0F);
+		int rowHeight = Math.max(10 - (rows - 2), 3);
+		int current = Mth.ceil(player.getHealth());
+		int future = Math.min(Mth.ceil(player.getHealth() + gain), Mth.ceil(maxHealth));
+		int containers = Mth.ceil(maxHealth / 2.0);
+		int baseX = HudElementType.HEALTH.defaultX(graphics.guiWidth());
+		int baseY = HudElementType.HEALTH.defaultY(graphics.guiHeight());
+		int alpha = Math.round((float) (0.35 + 0.45 * Math.abs(Math.sin(Util.getMillis() / 300.0))) * 255);
+		for (int i = 0; i < containers; i++) {
+			int now = Math.clamp(current - i * 2, 0, 2);
+			int then = Math.clamp(future - i * 2, 0, 2);
+			if (then <= now) {
+				continue;
+			}
+			int x = baseX + (i % 10) * 8;
+			int y = baseY - (i / 10) * rowHeight;
+			boolean onlyRightHalf = now == 1;
+			boolean half = then == 1;
+			PixelIcon.HEART.draw(graphics, x, y, (ch, px, py) -> {
+				if (ch == '.') {
+					return 0;
+				}
+				if (ch == 'o') {
+					return ARGB.color(alpha, 0x2A0618);
+				}
+				if ((half && px > 4) || (onlyRightHalf && px <= 4)) {
+					return 0;
+				}
+				return ARGB.color(alpha, ch == 'h' ? 0xFFD0E8 : 0xFF7DB8);
+			});
+		}
+	}
+
 	/** Wird vor den Hunger-Keulen gezeichnet. */
 	public static void underlay(GuiGraphicsExtractor graphics) {
 		LuConfig c = LuConfig.get();
@@ -50,11 +149,7 @@ public final class FoodInfo {
 			return;
 		}
 		// Erschöpfung wird nicht an Clients geschickt – im Einzelspieler lesen wir sie direkt vom Server
-		ServerPlayer serverPlayer = mc.getSingleplayerServer().getPlayerList().getPlayer(mc.player.getUUID());
-		if (serverPlayer == null) {
-			return;
-		}
-		float exhaustion = ((FoodDataAccessor) serverPlayer.getFoodData()).luhub$getExhaustionLevel();
+		float exhaustion = exhaustion(mc);
 		int width = Math.round(81 * Math.clamp(exhaustion / 4f, 0f, 1f));
 		int right = HudElementType.FOOD.defaultX(graphics.guiWidth()) + 81;
 		int y = HudElementType.FOOD.defaultY(graphics.guiHeight());

@@ -157,5 +157,6 @@
   "luhub.sort.container": "Sort chest",
   "luhub.sort.inventory": "Sort inventory",
   "luhub.sort.quick_stack": "Quick stack (matching items into chest)",
-  "luhub.sort.restock": "Restock (matching items into inventory)"
+  "luhub.sort.restock": "Restock (matching items into inventory)",
+  "luhub.config.food_health_preview": "Healing preview"
 }

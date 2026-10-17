@@ -318,6 +318,7 @@ public final class LuConfigScreen extends Screen {
 		toggle("luhub.config.food_saturation", c.foodSaturationOverlay, v -> c.foodSaturationOverlay = v).active = !ExternalMods.APPLESKIN;
 		toggle("luhub.config.food_exhaustion", c.foodExhaustionUnderlay, v -> c.foodExhaustionUnderlay = v).active = !ExternalMods.APPLESKIN;
 		toggle("luhub.config.food_preview", c.foodHeldPreview, v -> c.foodHeldPreview = v).active = !ExternalMods.APPLESKIN;
+		toggle("luhub.config.food_health_preview", c.foodHealthPreview, v -> c.foodHealthPreview = v).active = !ExternalMods.APPLESKIN;
 		// Shulker-Vorschau (wie Shulker Box Tooltip)
 		toggle("luhub.config.shulker_preview", c.shulkerPreview, v -> c.shulkerPreview = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;
 		toggle("luhub.config.shulker_hide_lines", c.shulkerPreviewHideLines, v -> c.shulkerPreviewHideLines = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;

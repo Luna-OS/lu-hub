@@ -60,6 +60,9 @@ public final class LuHud {
 				if (type == HudElementType.FOOD) {
 					FoodInfo.overlay(graphics);
 				}
+				if (type == HudElementType.HEALTH) {
+					FoodInfo.healthOverlay(graphics);
+				}
 				return;
 			}
 			HudElementConfig ec = config.hud(type);
@@ -88,6 +91,9 @@ public final class LuHud {
 			}
 			if (food) {
 				FoodInfo.overlay(graphics);
+			}
+			if (type == HudElementType.HEALTH) {
+				FoodInfo.healthOverlay(graphics);
 			}
 			if (transformed) {
 				pose.popMatrix();

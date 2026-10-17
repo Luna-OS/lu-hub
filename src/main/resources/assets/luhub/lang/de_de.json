@@ -157,5 +157,6 @@
   "luhub.sort.container": "Kiste sortieren",
   "luhub.sort.inventory": "Inventar sortieren",
   "luhub.sort.quick_stack": "Einräumen (passende Items in die Kiste)",
-  "luhub.sort.restock": "Auffüllen (passende Items ins Inventar)"
+  "luhub.sort.restock": "Auffüllen (passende Items ins Inventar)",
+  "luhub.config.food_health_preview": "Heilungs-Vorschau"
 }

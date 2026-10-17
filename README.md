@@ -93,7 +93,7 @@ Lu Hub bringt die Funktionen dieser Mods selbst mit (eigene Umsetzung, im Theme-
 
 | Statt … | Lu Hub kann |
 |---|---|
-| AppleSkin | Hunger &amp; Sättigung im Tooltip, goldener Sättigungsrand auf der Hungerleiste, Vorschau beim Essen-Halten, Erschöpfung (Einzelspieler) |
+| AppleSkin | Hunger &amp; Sättigung im Tooltip, goldener Sättigungsrand auf der Hungerleiste, Vorschau beim Essen-Halten (Hunger, Sättigung **und wie viel Leben du dich heilst**), Erschöpfung (Einzelspieler) |
 | Shulker Box Tooltip | Inhalts-Vorschau als Raster im Tooltip, in der Farbe der Shulkerkiste |
 | Sorted | Knöpfe: Kiste sortieren, Inventar sortieren, Einräumen, Auffüllen; Taste `R` sortiert den Bereich unter der Maus (funktioniert auch auf Servern) |
 | uku's Armor HUD | Rüstungs-HUD mit Haltbarkeit (Balken/Prozent/Zahl), Warnung + Ton bei wenig Haltbarkeit, im HUD-Editor verschieb- und skalierbar |

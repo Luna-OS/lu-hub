@@ -61,6 +61,7 @@ public final class LuConfig {
 	public boolean foodSaturationOverlay = true;
 	public boolean foodExhaustionUnderlay = true;
 	public boolean foodHeldPreview = true;
+	public boolean foodHealthPreview = true;
 	public boolean shulkerPreview = true;
 	public boolean shulkerPreviewHideLines = true;
 	public boolean sortButtons = true;
