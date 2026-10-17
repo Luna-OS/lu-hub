@@ -182,8 +182,8 @@ public final class StatusBars {
 		}
 		int x = HudElementType.XP_BAR.defaultX(graphics.guiWidth());
 		int y = HudElementType.XP_BAR.defaultY(graphics.guiHeight());
-		int w = HudElementType.XP_BAR.width;
-		int h = HudElementType.XP_BAR.height;
+		int w = HudElementType.XP_BAR.width();
+		int h = HudElementType.XP_BAR.height();
 		int progress = LuHud.previewMode && mc.player.experienceProgress <= 0 ? w * 2 / 3 : (int) (mc.player.experienceProgress * (w - 2));
 
 		graphics.fill(x, y, x + w, y + h, ec.outlineColor);

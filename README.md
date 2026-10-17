@@ -88,6 +88,18 @@ Außerdem: Klick auf den **Mond** oben rechts in jedem Inventar/Container öffne
 - Das Sprite-Sheet (`assets/luhub/textures/gui/axo.png`) wird von `tools/axo_sprite.py` erzeugt
   und kann per Resource-Pack ersetzt werden
 
+### Extras – alles in einer Mod
+Lu Hub bringt die Funktionen dieser Mods selbst mit (eigene Umsetzung, im Theme-Stil) – du brauchst sie also nicht mehr:
+
+| Statt … | Lu Hub kann |
+|---|---|
+| AppleSkin | Hunger &amp; Sättigung im Tooltip, goldener Sättigungsrand auf der Hungerleiste, Vorschau beim Essen-Halten, Erschöpfung (Einzelspieler) |
+| Shulker Box Tooltip | Inhalts-Vorschau als Raster im Tooltip, in der Farbe der Shulkerkiste |
+| Sorted | Knöpfe: Kiste sortieren, Inventar sortieren, Einräumen, Auffüllen; Taste `R` sortiert den Bereich unter der Maus (funktioniert auch auf Servern) |
+| uku's Armor HUD | Rüstungs-HUD mit Haltbarkeit (Balken/Prozent/Zahl), Warnung + Ton bei wenig Haltbarkeit, im HUD-Editor verschieb- und skalierbar |
+
+Alles ist im Tab **Extras** einstellbar. Ist eine der Original-Mods trotzdem installiert, schaltet Lu Hub seine Variante davon ab.
+
 ### REI
 Lu Hub ändert nur Vanilla-Texturen, Überschriften-Farben und Menü-Hintergründe – REI funktioniert ganz normal
 (die REI-Knöpfe nutzen die Vanilla-Knopf-Texturen und passen sich deshalb automatisch dem Theme an). Lu-Hub-Tasten werden nur im Spiel

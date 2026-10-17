@@ -2,6 +2,7 @@ package dev.lunaos.luhub.screen;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.lunaos.luhub.axo.AxoRenderer;
+import dev.lunaos.luhub.compat.ExternalMods;
 import dev.lunaos.luhub.config.BarStyle;
 import dev.lunaos.luhub.config.HudElementConfig;
 import dev.lunaos.luhub.config.HudElementType;
@@ -29,7 +30,7 @@ import java.util.function.Supplier;
 
 /** Einstellungen von Lu Hub, aufgeteilt in Tabs. */
 public final class LuConfigScreen extends Screen {
-	private enum Tab { GENERAL, HUD, DEBUG, THEME, AXO }
+	private enum Tab { GENERAL, HUD, DEBUG, THEME, AXO, EXTRAS }
 
 	private static final int ROW = 24;
 	private static final int COLUMN_WIDTH = 150;
@@ -84,6 +85,7 @@ public final class LuConfigScreen extends Screen {
 			case DEBUG -> buildDebug();
 			case THEME -> buildTheme();
 			case AXO -> buildAxo();
+			case EXTRAS -> buildExtras();
 		}
 		if (nextColumn != 0) {
 			nextRow++;
@@ -195,7 +197,7 @@ public final class LuConfigScreen extends Screen {
 		LuConfig c = LuConfig.get();
 		HudElementConfig ec = c.hud(selectedHud);
 		add(CycleButton.<HudElementType>builder(HudElementType::label, selectedHud)
-			.withValues(HudElementType.values())
+			.withValues(java.util.Arrays.stream(HudElementType.values()).filter(HudElementType::available).toList())
 			.create(0, 0, COLUMN_WIDTH, 20, Component.translatable("luhub.config.element"), (b, v) -> {
 				selectedHud = v;
 				rebuildWidgets();
@@ -307,6 +309,39 @@ public final class LuConfigScreen extends Screen {
 			resourcesDirty = true;
 			rebuildWidgets();
 		}).bounds(0, 0, 100, 20).build());
+	}
+
+	private void buildExtras() {
+		LuConfig c = LuConfig.get();
+		// Hunger-Infos (wie AppleSkin)
+		toggle("luhub.config.food_tooltip", c.foodTooltip, v -> c.foodTooltip = v).active = !ExternalMods.APPLESKIN;
+		toggle("luhub.config.food_saturation", c.foodSaturationOverlay, v -> c.foodSaturationOverlay = v).active = !ExternalMods.APPLESKIN;
+		toggle("luhub.config.food_exhaustion", c.foodExhaustionUnderlay, v -> c.foodExhaustionUnderlay = v).active = !ExternalMods.APPLESKIN;
+		toggle("luhub.config.food_preview", c.foodHeldPreview, v -> c.foodHeldPreview = v).active = !ExternalMods.APPLESKIN;
+		// Shulker-Vorschau (wie Shulker Box Tooltip)
+		toggle("luhub.config.shulker_preview", c.shulkerPreview, v -> c.shulkerPreview = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;
+		toggle("luhub.config.shulker_hide_lines", c.shulkerPreviewHideLines, v -> c.shulkerPreviewHideLines = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;
+		// Sortieren (wie Sorted)
+		toggle("luhub.config.sort_buttons", c.sortButtons, v -> c.sortButtons = v).active = !ExternalMods.SORTED;
+		toggle("luhub.config.sort_hotbar", c.sortHotbar, v -> c.sortHotbar = v).active = !ExternalMods.SORTED;
+		// Rüstungs-HUD (wie uku's Armor HUD)
+		boolean armor = !ExternalMods.UKUS_ARMOR_HUD;
+		HudElementConfig armorHud = c.hud(HudElementType.ARMOR_HUD);
+		toggle("luhub.config.armor_hud", armorHud.visible, v -> armorHud.visible = v).active = armor;
+		add(CycleButton.<dev.lunaos.luhub.config.ArmorHudOrientation>builder(dev.lunaos.luhub.config.ArmorHudOrientation::label, c.armorOrientation)
+			.withValues(dev.lunaos.luhub.config.ArmorHudOrientation.values())
+			.create(0, 0, COLUMN_WIDTH, 20, Component.translatable("luhub.config.armor_orientation"), (b, v) -> c.armorOrientation = v)).active = armor;
+		add(CycleButton.<dev.lunaos.luhub.config.ArmorDurability>builder(dev.lunaos.luhub.config.ArmorDurability::label, c.armorDurability)
+			.withValues(dev.lunaos.luhub.config.ArmorDurability.values())
+			.create(0, 0, COLUMN_WIDTH, 20, Component.translatable("luhub.config.armor_durability"), (b, v) -> c.armorDurability = v)).active = armor;
+		toggle("luhub.config.armor_hands", c.armorShowHands, v -> c.armorShowHands = v).active = armor;
+		toggle("luhub.config.armor_empty", c.armorShowEmpty, v -> c.armorShowEmpty = v).active = armor;
+		toggle("luhub.config.armor_sound", c.armorWarnSound, v -> c.armorWarnSound = v).active = armor;
+		slider("luhub.config.armor_warn", 0f, 50f, 1f, () -> (float) c.armorWarnPercent, v -> c.armorWarnPercent = Math.round(v)).active = armor;
+		skipToNewRow();
+		if (ExternalMods.APPLESKIN || ExternalMods.SHULKER_BOX_TOOLTIP || ExternalMods.SORTED || ExternalMods.UKUS_ARMOR_HUD) {
+			addWide(Button.builder(Component.translatable("luhub.config.external_hint"), b -> { }).bounds(0, 0, 100, 20).build()).active = false;
+		}
 	}
 
 	private void buildAxo() {

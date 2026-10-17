@@ -13,10 +13,12 @@ public enum HudElementType {
 	FOOD(81, 9, true, 0xFFFFC46B),
 	AIR(81, 9, true, 0xFF8FE3FF),
 	XP_BAR(182, 5, true, 0xFF9DF5C4),
-	XP_LEVEL(30, 9, true, 0xFF9DF5C4);
+	XP_LEVEL(30, 9, true, 0xFF9DF5C4),
+	/** Eigene Rüstungs-HUD: Rüstungsteile (und Hände) mit Haltbarkeit. Stil = Farbe der Haltbarkeitsleisten. */
+	ARMOR_HUD(0, 0, true, 0xFF9DF5C4);
 
-	public final int width;
-	public final int height;
+	private final int width;
+	private final int height;
 	public final boolean styleable;
 	public final int defaultFill;
 
@@ -27,11 +29,26 @@ public enum HudElementType {
 		this.defaultFill = defaultFill;
 	}
 
+	/** false, wenn die Funktion abgeschaltet ist, weil die Original-Mod installiert ist. */
+	public boolean available() {
+		return this != ARMOR_HUD || !dev.lunaos.luhub.compat.ExternalMods.UKUS_ARMOR_HUD;
+	}
+
+	public int width() {
+		return this == ARMOR_HUD ? ArmorHudLayout.width() : width;
+	}
+
+	public int height() {
+		return this == ARMOR_HUD ? ArmorHudLayout.height() : height;
+	}
+
 	public int defaultX(int screenWidth) {
 		return switch (this) {
 			case HOTBAR, HEALTH, ARMOR, XP_BAR -> screenWidth / 2 - 91;
 			case FOOD, AIR -> screenWidth / 2 + 91 - 81;
 			case XP_LEVEL -> screenWidth / 2 - 15;
+			// links neben der Hotbar (mit Platz für den Zweithand-Slot); passt das nicht, ganz an den linken Rand
+			case ARMOR_HUD -> Math.max(2, screenWidth / 2 - 91 - 29 - 6 - width());
 		};
 	}
 
@@ -42,7 +59,14 @@ public enum HudElementType {
 			case ARMOR, AIR -> screenHeight - 49;
 			case XP_BAR -> screenHeight - 29;
 			case XP_LEVEL -> screenHeight - 35;
+			case ARMOR_HUD -> armorFitsBesideHotbar() ? screenHeight - height() - 1 : screenHeight - 24 - height() - 2;
 		};
+	}
+
+	private static boolean armorFitsBesideHotbar() {
+		net.minecraft.client.Minecraft mc = net.minecraft.client.Minecraft.getInstance();
+		int screenWidth = mc.getWindow().getGuiScaledWidth();
+		return screenWidth / 2 - 91 - 29 - 6 - ArmorHudLayout.width() >= 2;
 	}
 
 	public BarStyle defaultStyle() {

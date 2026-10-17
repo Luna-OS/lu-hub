@@ -13,6 +13,8 @@ repositories {
 	maven { url = 'https://maven.architectury.dev/' }
 	// Mod Menu
 	maven { url = 'https://maven.terraformersmc.com/releases/' }
+	// Modrinth (für den optionalen Test mit den Original-Mods)
+	maven { url = 'https://api.modrinth.com/maven' }
 }
 
 fabricApi {
@@ -44,6 +46,17 @@ dependencies {
 	gametestRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") { transitive = false }
 	gametestRuntimeOnly("dev.architectury:architectury-fabric:${project.architectury_version}") { transitive = false }
 	gametestRuntimeOnly("me.shedaniel.cloth:cloth-config-fabric:${project.cloth_config_version}") { transitive = false }
+
+	// ./gradlew runClientGameTest -PwithOriginalMods: testet, dass Lu Hub neben AppleSkin, Shulker Box Tooltip,
+	// Sorted und uku's Armor HUD läuft (Lu Hub schaltet seine eigenen Varianten dann ab)
+	if (project.hasProperty('withOriginalMods')) {
+		gametestRuntimeOnly("maven.modrinth:appleskin:3.0.10+mc26.3") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:shulkerboxtooltip:5.4.2+26.3-fabric") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:sorted:yCuh96Ws") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:yacl:3.9.7+26.3-fabric") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:ukus-armor-hud:0.14.0+mc26.3-fabric") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:ukulib:2.2.0+26.3-fabric") { transitive = false }
+	}
 
 	// Mod Menu ist optional (Einstellungs-Button in der Mod-Liste)
 	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }

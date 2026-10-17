@@ -56,6 +56,22 @@ public final class LuConfig {
 	public boolean axoOnlyInventory = false;
 	public boolean axoAnimated = true;
 
+	// ---------- Extras (eingebaute Funktionen von AppleSkin, Shulker Box Tooltip, Sorted, Armor HUD) ----------
+	public boolean foodTooltip = true;
+	public boolean foodSaturationOverlay = true;
+	public boolean foodExhaustionUnderlay = true;
+	public boolean foodHeldPreview = true;
+	public boolean shulkerPreview = true;
+	public boolean shulkerPreviewHideLines = true;
+	public boolean sortButtons = true;
+	public boolean sortHotbar = false;
+	public ArmorHudOrientation armorOrientation = ArmorHudOrientation.HORIZONTAL;
+	public ArmorDurability armorDurability = ArmorDurability.BAR;
+	public boolean armorShowEmpty = false;
+	public boolean armorShowHands = true;
+	public int armorWarnPercent = 10;
+	public boolean armorWarnSound = true;
+
 	// ---------- HUD ----------
 	public boolean hudEnabled = true;
 	public Map<HudElementType, HudElementConfig> hud = new EnumMap<>(HudElementType.class);
@@ -174,6 +190,13 @@ public final class LuConfig {
 			p.scale = Math.clamp(p.scale, 0.25f, 4f);
 		}
 		debugScale = Math.clamp(debugScale, 0.25f, 4f);
+		if (armorOrientation == null) {
+			armorOrientation = ArmorHudOrientation.HORIZONTAL;
+		}
+		if (armorDurability == null) {
+			armorDurability = ArmorDurability.BAR;
+		}
+		armorWarnPercent = Math.clamp(armorWarnPercent, 0, 100);
 		starDensity = Math.clamp(starDensity, 0f, 4f);
 	}
 }

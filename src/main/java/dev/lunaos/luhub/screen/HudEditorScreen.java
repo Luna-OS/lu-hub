@@ -62,6 +62,9 @@ public final class HudEditorScreen extends Screen {
 		LuConfig config = LuConfig.get();
 		HudElementType hovered = elementAt(mouseX, mouseY);
 		for (HudElementType type : HudElementType.values()) {
+			if (!type.available()) {
+				continue;
+			}
 			int[] b = LuHud.bounds(type, width, height);
 			HudElementConfig ec = config.hud(type);
 			boolean active = type == selected || type == dragging;
@@ -98,6 +101,9 @@ public final class HudEditorScreen extends Screen {
 		HudElementType best = null;
 		int bestArea = Integer.MAX_VALUE;
 		for (HudElementType type : types) {
+			if (!type.available()) {
+				continue;
+			}
 			int[] b = LuHud.bounds(type, width, height);
 			if (mx >= b[0] - 1 && my >= b[1] - 1 && mx <= b[0] + b[2] + 1 && my <= b[1] + b[3] + 1) {
 				int area = b[2] * b[3];
@@ -151,8 +157,8 @@ public final class HudEditorScreen extends Screen {
 		int baseY = dragging.defaultY(height);
 		if (resizing) {
 			int[] b = LuHud.bounds(dragging, width, height);
-			float sx = (float) (event.x() - b[0]) / dragging.width;
-			float sy = (float) (event.y() - b[1]) / dragging.height;
+			float sx = (float) (event.x() - b[0]) / dragging.width();
+			float sy = (float) (event.y() - b[1]) / dragging.height();
 			float scale = Math.max(sx, sy);
 			ec.scale = Math.clamp(Math.round(scale * 20f) / 20f, 0.25f, 4f);
 		} else {
@@ -160,8 +166,8 @@ public final class HudEditorScreen extends Screen {
 			int newY = (int) Math.round(event.y() - grabY);
 			if (!minecraft.hasShiftDown()) {
 				// am Bildschirmrand und an der Mitte einrasten
-				int w = Math.round(dragging.width * ec.scale);
-				int h = Math.round(dragging.height * ec.scale);
+				int w = Math.round(dragging.width() * ec.scale);
+				int h = Math.round(dragging.height() * ec.scale);
 				newX = snap(newX, w, width);
 				newY = snap(newY, h, height);
 			}

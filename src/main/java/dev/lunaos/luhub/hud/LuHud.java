@@ -4,11 +4,13 @@ import dev.lunaos.luhub.config.BarStyle;
 import dev.lunaos.luhub.config.HudElementConfig;
 import dev.lunaos.luhub.config.HudElementType;
 import dev.lunaos.luhub.config.LuConfig;
+import dev.lunaos.luhub.food.FoodInfo;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElement;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.HudElementRegistry;
 import net.fabricmc.fabric.api.client.rendering.v1.hud.VanillaHudElements;
 import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
+import net.minecraft.resources.Identifier;
 import org.joml.Matrix3x2fStack;
 
 /**
@@ -36,13 +38,28 @@ public final class LuHud {
 		HudElementRegistry.replaceElement(VanillaHudElements.AIR_BAR, original -> wrap(HudElementType.AIR, original, StatusBars::air));
 		HudElementRegistry.replaceElement(VanillaHudElements.INFO_BAR, original -> wrap(HudElementType.XP_BAR, original, StatusBars::xpBar));
 		HudElementRegistry.replaceElement(VanillaHudElements.EXPERIENCE_LEVEL, original -> wrap(HudElementType.XP_LEVEL, original, StatusBars::xpLevel));
+		if (HudElementType.ARMOR_HUD.available()) {
+			HudElementRegistry.attachElementAfter(VanillaHudElements.HOTBAR, Identifier.fromNamespaceAndPath("luhub", "armor_hud"),
+				wrap(HudElementType.ARMOR_HUD, (graphics, delta) -> { }, ArmorHud::extract));
+		}
 	}
 
 	private static HudElement wrap(HudElementType type, HudElement original, CustomRenderer custom) {
 		return (graphics, delta) -> {
 			LuConfig config = LuConfig.get();
 			if (!config.hudEnabled) {
-				original.extractRenderState(graphics, delta);
+				// eigene HUD aus: Vanilla zeichnen, eingebaute Extras (Rüstungs-HUD, Hunger-Infos) bleiben
+				if (type == HudElementType.FOOD) {
+					FoodInfo.underlay(graphics);
+				}
+				if (type == HudElementType.ARMOR_HUD) {
+					custom.render(graphics, delta, config.hud(type));
+				} else {
+					original.extractRenderState(graphics, delta);
+				}
+				if (type == HudElementType.FOOD) {
+					FoodInfo.overlay(graphics);
+				}
 				return;
 			}
 			HudElementConfig ec = config.hud(type);
@@ -59,10 +76,18 @@ public final class LuHud {
 				pose.scale(ec.scale, ec.scale);
 				pose.translate(-baseX, -baseY);
 			}
-			boolean handled = custom != null && type.styleable && ec.style != BarStyle.VANILLA
+			boolean food = type == HudElementType.FOOD;
+			if (food) {
+				FoodInfo.underlay(graphics);
+			}
+			boolean alwaysCustom = type == HudElementType.ARMOR_HUD;
+			boolean handled = custom != null && type.styleable && (alwaysCustom || ec.style != BarStyle.VANILLA)
 				&& custom.render(graphics, delta, ec);
 			if (!handled) {
 				original.extractRenderState(graphics, delta);
+			}
+			if (food) {
+				FoodInfo.overlay(graphics);
 			}
 			if (transformed) {
 				pose.popMatrix();
@@ -75,6 +100,6 @@ public final class LuHud {
 		HudElementConfig ec = LuConfig.get().hud(type);
 		int x = type.defaultX(screenWidth) + ec.dx;
 		int y = type.defaultY(screenHeight) + ec.dy;
-		return new int[]{x, y, Math.round(type.width * ec.scale), Math.round(type.height * ec.scale)};
+		return new int[]{x, y, Math.round(type.width() * ec.scale), Math.round(type.height() * ec.scale)};
 	}
 }

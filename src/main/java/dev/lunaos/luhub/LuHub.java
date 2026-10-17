@@ -9,7 +9,9 @@ import dev.lunaos.luhub.mixin.ImageButtonAccessor;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
+import dev.lunaos.luhub.sort.SortButtons;
 import dev.lunaos.luhub.theme.ThemeDecor;
+import dev.lunaos.luhub.tooltip.LuTooltips;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
@@ -37,6 +39,7 @@ public final class LuHub implements ClientModInitializer {
 	public static KeyMapping keyHudEditor;
 	public static KeyMapping keyDebugEditor;
 	public static KeyMapping keyDebugToggle;
+	public static KeyMapping keySort;
 
 	@Override
 	public void onInitializeClient() {
@@ -48,6 +51,10 @@ public final class LuHub implements ClientModInitializer {
 		keyDebugEditor = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.debug_editor", InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), CATEGORY));
 		keyDebugToggle = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.debug_toggle", InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), CATEGORY));
 
+		keySort = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.sort", InputConstants.Type.KEYBOARD, InputConstants.KEY_R, CATEGORY));
+
+		LuTooltips.register();
+		SortButtons.register();
 		ClientTickEvents.END_CLIENT_TICK.register(LuHub::handleKeys);
 		registerContainerDecor();
 		LOGGER.info("Lu Hub geladen – gute Nacht, Axo!");

@@ -3,7 +3,9 @@ package dev.lunaos.luhub.test;
 import dev.lunaos.luhub.config.BarStyle;
 import dev.lunaos.luhub.config.HudElementType;
 import dev.lunaos.luhub.config.LuConfig;
+import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
 import dev.lunaos.luhub.screen.ColorPickerScreen;
+import dev.lunaos.luhub.sort.Sorter;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
@@ -32,6 +34,13 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			world.getServer().runCommand("give @a minecraft:diamond_sword");
 			world.getServer().runCommand("give @a minecraft:golden_apple 5");
 			world.getServer().runCommand("give @a minecraft:torch 32");
+			world.getServer().runCommand("give @a minecraft:red_shulker_box[minecraft:container=[{slot:0,item:{id:\"minecraft:diamond\",count:5}},"
+				+ "{slot:4,item:{id:\"minecraft:cake\",count:1}},{slot:13,item:{id:\"minecraft:axolotl_bucket\",count:1}},{slot:26,item:{id:\"minecraft:torch\",count:64}}]]");
+			world.getServer().runCommand("item replace entity @a armor.head with minecraft:diamond_helmet");
+			world.getServer().runCommand("item replace entity @a armor.chest with minecraft:iron_chestplate[minecraft:damage=200]");
+			world.getServer().runCommand("item replace entity @a armor.legs with minecraft:golden_leggings[minecraft:damage=100]");
+			world.getServer().runCommand("item replace entity @a armor.feet with minecraft:leather_boots[minecraft:damage=40]");
+			world.getServer().runCommand("item replace entity @a weapon.offhand with minecraft:bread 6");
 			world.getServer().runCommand("xp add @a 7 levels");
 			world.getServer().runCommand("xp add @a 40 points");
 			world.getServer().runCommand("damage @a 7");
@@ -56,6 +65,10 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.setScreen(() -> new InventoryScreen(context.computeOnClient(mc -> mc.player)));
 			context.waitTicks(5);
 			context.takeScreenshot("luhub-06-inventory");
+			hoverHotbarSlot(context, 3);
+			context.takeScreenshot("luhub-06b-shulker-tooltip");
+			hoverHotbarSlot(context, 1);
+			context.takeScreenshot("luhub-06c-food-tooltip");
 
 			context.setScreen(() -> new HudEditorScreen(null));
 			context.waitTicks(5);
@@ -75,12 +88,17 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.setScreen(() -> null);
 
 			world.getServer().runCommand("setblock 2 -60 0 minecraft:chest{Items:[{Slot:0b,id:\"minecraft:diamond\",count:12},"
-				+ "{Slot:4b,id:\"minecraft:amethyst_shard\",count:30},{Slot:13b,id:\"minecraft:axolotl_bucket\",count:1}]}");
+				+ "{Slot:4b,id:\"minecraft:amethyst_shard\",count:30},{Slot:13b,id:\"minecraft:axolotl_bucket\",count:1},"
+				+ "{Slot:20b,id:\"minecraft:diamond\",count:7},{Slot:8b,id:\"minecraft:stone\",count:40},{Slot:16b,id:\"minecraft:stone\",count:30},"
+				+ "{Slot:25b,id:\"minecraft:amethyst_shard\",count:5},{Slot:11b,id:\"minecraft:apple\",count:3}]}");
 			world.getServer().runCommand("setblock -2 -60 0 minecraft:furnace{Items:[{Slot:0b,id:\"minecraft:raw_iron\",count:8},"
 				+ "{Slot:1b,id:\"minecraft:coal\",count:4}]}");
 			context.waitTicks(10);
 			openContainer(context, new BlockPos(2, -60, 0), ContainerScreen.class);
 			context.takeScreenshot("luhub-12-chest");
+			context.runOnClient(mc -> Sorter.sort(Sorter.Region.CONTAINER));
+			context.waitTicks(5);
+			context.takeScreenshot("luhub-12b-chest-sorted");
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 			context.waitTicks(5);
 			openContainer(context, new BlockPos(-2, -60, 0), FurnaceScreen.class);
@@ -120,6 +138,17 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.waitTicks(120);
 			context.takeScreenshot("luhub-11-air");
 		}
+	}
+
+	/** Bewegt die Maus über einen Hotbar-Slot im Inventar, damit der Tooltip erscheint. */
+	private static void hoverHotbarSlot(ClientGameTestContext context, int slot) {
+		double[] pos = context.computeOnClient(mc -> {
+			AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) mc.gui.screen();
+			double scale = mc.getWindow().getGuiScale();
+			return new double[]{(acc.luhub$getLeftPos() + 8 + slot * 18 + 8) * scale, (acc.luhub$getTopPos() + 142 + 8) * scale};
+		});
+		context.getInput().setCursorPos(pos[0], pos[1]);
+		context.waitTicks(5);
 	}
 
 	private static void openContainer(ClientGameTestContext context, BlockPos pos, Class<? extends Screen> screen) {
