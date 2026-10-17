@@ -1,0 +1,18 @@
+{
+	"schemaVersion": 1,
+	"id": "luhub-test",
+	"version": "1.0.0",
+	"name": "Lu Hub Test",
+	"environment": "*",
+	"entrypoints": {
+		"fabric-client-gametest": [
+			"dev.lunaos.luhub.test.LuHubClientTest"
+		]
+	},
+	"depends": {
+		"luhub": "*"
+	},
+	"mixins": [
+		"luhub-test.mixins.json"
+	]
+}

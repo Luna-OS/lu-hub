@@ -1,0 +1,37 @@
+{
+	"schemaVersion": 1,
+	"id": "luhub",
+	"version": "${version}",
+	"name": "Lu Hub",
+	"description": "Nachthimmel-Theme für HUD, Inventar und Container, frei verschiebbare & farbige F3-Ansicht, Pride-Varianten für Herzen, Hunger, Luft und XP – und Axo, das Maskottchen.",
+	"authors": [
+		"Luna-OS"
+	],
+	"contact": {
+		"sources": "https://github.com/Luna-OS/lu-hub"
+	},
+	"license": "MIT",
+	"icon": "assets/luhub/icon.png",
+	"environment": "client",
+	"entrypoints": {
+		"client": [
+			"dev.lunaos.luhub.LuHub"
+		],
+		"modmenu": [
+			"dev.lunaos.luhub.compat.modmenu.LuModMenu"
+		]
+	},
+	"mixins": [
+		"luhub.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.19.5",
+		"minecraft": "~26.3",
+		"java": ">=25",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"roughlyenoughitems": "*",
+		"modmenu": "*"
+	}
+}
