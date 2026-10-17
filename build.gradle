@@ -50,11 +50,11 @@ dependencies {
 	// ./gradlew runClientGameTest -PwithOriginalMods: testet, dass Lu Hub neben AppleSkin, Shulker Box Tooltip,
 	// Sorted und uku's Armor HUD läuft (Lu Hub schaltet seine eigenen Varianten dann ab)
 	if (project.hasProperty('withOriginalMods')) {
-		gametestRuntimeOnly("maven.modrinth:appleskin:3.0.10+mc26.3") { transitive = false }
-		gametestRuntimeOnly("maven.modrinth:shulkerboxtooltip:5.4.2+26.3-fabric") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:appleskin:PHjDtQay") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:shulkerboxtooltip:Cj9VEeGt") { transitive = false }
 		gametestRuntimeOnly("maven.modrinth:sorted:yCuh96Ws") { transitive = false }
 		gametestRuntimeOnly("maven.modrinth:yacl:3.9.7+26.3-fabric") { transitive = false }
-		gametestRuntimeOnly("maven.modrinth:ukus-armor-hud:0.14.0+mc26.3-fabric") { transitive = false }
+		gametestRuntimeOnly("maven.modrinth:ukus-armor-hud:URl1E7bP") { transitive = false }
 		gametestRuntimeOnly("maven.modrinth:ukulib:2.2.0+26.3-fabric") { transitive = false }
 	}
 

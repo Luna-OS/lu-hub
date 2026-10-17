@@ -1,6 +1,7 @@
 package dev.lunaos.luhub.mixin;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import dev.lunaos.luhub.compat.ShulkerBoxTooltipCompat;
 import dev.lunaos.luhub.theme.NightTheme;
 import net.minecraft.client.renderer.texture.SpriteContents;
 import net.minecraft.resources.Identifier;
@@ -27,6 +28,10 @@ public abstract class SpriteContentsMixin {
 		at = @At("RETURN")
 	)
 	private void luhub$themeSprite(CallbackInfo ci) {
+		if (this.name.equals(ShulkerBoxTooltipCompat.WINDOW_SPRITE) && ShulkerBoxTooltipCompat.themed()) {
+			NightTheme.apply(this.originalImage, this.name.hashCode(), NightTheme.Kind.PANEL, ShulkerBoxTooltipCompat.neutralPalette());
+			return;
+		}
 		NightTheme.Kind kind = NightTheme.spriteKind(this.name);
 		if (kind != null) {
 			NightTheme.apply(this.originalImage, this.name, kind);

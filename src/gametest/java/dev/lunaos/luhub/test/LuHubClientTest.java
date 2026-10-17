@@ -69,6 +69,11 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.takeScreenshot("luhub-06-inventory");
 			hoverHotbarSlot(context, 3);
 			context.takeScreenshot("luhub-06b-shulker-tooltip");
+			// Shulker Box Tooltip (falls installiert) zeigt die Vorschau erst mit Shift
+			context.getInput().holdShift();
+			context.waitTicks(3);
+			context.takeScreenshot("luhub-06d-shulker-tooltip-shift");
+			context.getInput().releaseShift();
 			hoverHotbarSlot(context, 1);
 			context.takeScreenshot("luhub-06c-food-tooltip");
 
