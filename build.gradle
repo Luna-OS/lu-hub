@@ -11,9 +11,7 @@ repositories {
 	// REI, Architectury und Cloth Config – nur für den Kompatibilitätstest
 	maven { url = 'https://maven.shedaniel.me/' }
 	maven { url = 'https://maven.architectury.dev/' }
-	// Mod Menu
-	maven { url = 'https://maven.terraformersmc.com/releases/' }
-	// Modrinth (für den optionalen Test mit den Original-Mods)
+	// Modrinth: Mod Menu und die Original-Mods für den optionalen Kompatibilitätstest
 	maven { url = 'https://api.modrinth.com/maven' }
 }
 
@@ -68,7 +66,7 @@ dependencies {
 	}
 
 	// Mod Menu ist optional (Einstellungs-Button in der Mod-Liste)
-	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }
+	compileOnly("maven.modrinth:modmenu:${project.modmenu_version}") { transitive = false }
 }
 
 processResources {
