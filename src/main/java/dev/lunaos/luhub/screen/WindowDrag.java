@@ -5,6 +5,7 @@ import dev.lunaos.luhub.compat.ExternalMods;
 import dev.lunaos.luhub.compat.TutorialTrackerCompat;
 import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
+import dev.lunaos.luhub.mixin.AbstractRecipeBookScreenAccessor;
 import dev.lunaos.luhub.mixin.ButtonAccessor;
 import dev.lunaos.luhub.theme.ThemeDecor;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -13,6 +14,7 @@ import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
+import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.world.inventory.Slot;
 
 import java.util.Map;
@@ -78,7 +80,7 @@ public final class WindowDrag {
 	}
 
 	/** Fenster mit Rezeptbuch rechnen ihre X-Position selbst aus – hier kommt die Verschiebung dazu. */
-	public static int offsetLeft(int leftPos, int screenWidth, int imageWidth) {
+	public static int offsetLeft(int leftPos, boolean bookBesideWindow) {
 		if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) {
 			return leftPos;
 		}
@@ -86,7 +88,42 @@ public final class WindowDrag {
 		if (base != null) {
 			base[0] = leftPos; // Fenster mit Rezeptbuch: das ist die eigentliche Ausgangsposition
 		}
-		return clamp(leftPos + offset(screen)[0], screenWidth - imageWidth);
+		return leftPos + recipeBookShift(bookBesideWindow)[0];
+	}
+
+	/**
+	 * Wie weit ein Fenster mit Rezeptbuch verschoben ist: [x, y]. Das Rezeptbuch wandert genauso weit mit;
+	 * steht es links neben dem Fenster, bleiben auch seine Reiter im Bild.
+	 */
+	public static int[] recipeBookShift(boolean bookBesideWindow) {
+		if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) {
+			return new int[]{0, 0};
+		}
+		int[] offset = offset(screen);
+		if (offset[0] == 0 && offset[1] == 0) {
+			return offset;
+		}
+		AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) screen;
+		int width = acc.luhub$getImageWidth();
+		int height = acc.luhub$getImageHeight();
+		// gleiche Rechnung wie RecipeBookComponent.updateScreenPosition / getXOrigin
+		int baseLeft = bookBesideWindow ? 177 + (screen.width - width - 200) / 2 : (screen.width - width) / 2;
+		int minLeft = bookBesideWindow ? Math.max(0, baseLeft - ((screen.width - 147) / 2 - 86 - 30)) : 0;
+		int left = Math.max(minLeft, Math.min(baseLeft + offset[0], screen.width - width));
+		int baseTop = (screen.height - height) / 2;
+		return new int[]{left - baseLeft, clamp(baseTop + offset[1], screen.height - height) - baseTop};
+	}
+
+	/** Wie weit das Fenster gerade senkrecht verschoben ist (für Knöpfe, die an der Bildschirmmitte hängen). */
+	public static int shiftY(AbstractContainerScreen<?> screen) {
+		AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) screen;
+		return acc.luhub$getTopPos() - (screen.height - acc.luhub$getImageHeight()) / 2;
+	}
+
+	/** Ist das Rezeptbuch offen? Dann wird beim Ziehen alles neu angeordnet, damit es mitwandert. */
+	private static boolean recipeBookOpen(AbstractContainerScreen<?> screen) {
+		return screen instanceof AbstractRecipeBookScreen<?>
+			&& ((AbstractRecipeBookScreenAccessor) screen).luhub$getRecipeBookComponent().isVisible();
 	}
 
 	private static int clamp(int value, int max) {
@@ -130,6 +167,15 @@ public final class WindowDrag {
 				AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) container;
 				int newX = startOffsetX + (int) Math.round(event.x() - startMouseX);
 				int newY = startOffsetY + (int) Math.round(event.y() - startMouseY);
+				if (recipeBookOpen(container)) {
+					// Rezeptbuch offen: alles neu anordnen, damit Buch, Reiter und Suchfeld mitwandern
+					int[] old = offset(container);
+					if (old[0] != newX || old[1] != newY) {
+						LuConfig.get().windowOffsets.put(key(container), new int[]{newX, newY});
+						container.resize(container.width, container.height);
+					}
+					return false;
+				}
 				int targetLeft = clamp((container.width - acc.luhub$getImageWidth()) / 2 + newX, container.width - acc.luhub$getImageWidth());
 				int targetTop = clamp((container.height - acc.luhub$getImageHeight()) / 2 + newY, container.height - acc.luhub$getImageHeight());
 				int moveX = targetLeft - acc.luhub$getLeftPos();

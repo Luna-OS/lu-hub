@@ -1,17 +1,48 @@
 package dev.lunaos.luhub.mixin;
 
+import com.llamalad7.mixinextras.injector.ModifyReturnValue;
 import dev.lunaos.luhub.screen.WindowDrag;
 import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.ModifyVariable;
 
-/** Fenster mit Rezeptbuch berechnen ihre X-Position neu – die gespeicherte Verschiebung gilt auch dort. */
+/** Verschobene Fenster mit Rezeptbuch: das Rezeptbuch samt Reitern wandert mit dem Fenster mit. */
 @Mixin(RecipeBookComponent.class)
 public abstract class RecipeBookComponentMixin {
-	@Inject(method = "updateScreenPosition", at = @At("RETURN"), cancellable = true)
-	private void luhub$offsetX(int width, int imageWidth, CallbackInfoReturnable<Integer> cir) {
-		cir.setReturnValue(WindowDrag.offsetLeft(cir.getReturnValue(), width, imageWidth));
+	@Shadow
+	private boolean widthTooNarrow;
+
+	@Shadow
+	public abstract boolean isVisible();
+
+	private boolean luhub$besideWindow() {
+		return isVisible() && !widthTooNarrow;
+	}
+
+	@ModifyReturnValue(method = "updateScreenPosition", at = @At("RETURN"))
+	private int luhub$offsetX(int leftPos) {
+		return WindowDrag.offsetLeft(leftPos, luhub$besideWindow());
+	}
+
+	@ModifyReturnValue(method = "getXOrigin", at = @At("RETURN"))
+	private int luhub$originX(int x) {
+		return x + WindowDrag.recipeBookShift(luhub$besideWindow())[0];
+	}
+
+	@ModifyReturnValue(method = "getYOrigin", at = @At("RETURN"))
+	private int luhub$originY(int y) {
+		return y + WindowDrag.recipeBookShift(luhub$besideWindow())[1];
+	}
+
+	@ModifyVariable(method = "updateTabs", at = @At("STORE"), ordinal = 0)
+	private int luhub$tabX(int x) {
+		return x + WindowDrag.recipeBookShift(luhub$besideWindow())[0];
+	}
+
+	@ModifyVariable(method = "updateTabs", at = @At("STORE"), ordinal = 1)
+	private int luhub$tabY(int y) {
+		return y + WindowDrag.recipeBookShift(luhub$besideWindow())[1];
 	}
 }

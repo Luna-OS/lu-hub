@@ -83,7 +83,7 @@ Außerdem: Klick auf den **Mond** oben rechts in jedem Inventar/Container öffne
 ### Fenster verschieben
 - Inventar, Kisten, Öfen, Shulkerkisten … an der **Titelleiste ziehen** (oder mit **Alt** irgendwo im Fenster)
 - Die Position wird pro Fenstertyp gespeichert, **Doppelklick** auf die Titelleiste setzt sie zurück
-- Rezeptbuch, REI, Sortier-Knöpfe und der Knopf von Tutorial Tracker wandern mit
+- Axo, das Rezeptbuch, die Sortier-Knöpfe und der Knopf von Tutorial Tracker wandern mit – REI bleibt an seinem Platz
 
 ### Titelbildschirm
 Sternenhimmel-Schleier, Sternschnuppen und Mond über dem Panorama; Knöpfe im Theme.
@@ -91,6 +91,9 @@ Sternenhimmel-Schleier, Sternschnuppen und Mond über dem Panorama; Knöpfe im T
 ### Tutorial Tracker
 Die Fenster von Tutorial Tracker (Luna-OS) erscheinen automatisch im Nachthimmel-Theme.
 Belegt eine andere Mod dieselbe Taste wie Lu Hub, weicht Lu Hub beim Start auf eine freie Taste aus.
+
+### Plasmo Voice
+Das Einstellungsmenü von Plasmo Voice (Taste `V`) erscheint mit Knöpfen, Reitern, Schiebern und Hintergrund im Nachthimmel-Theme.
 
 ### Axo
 - Axo ersetzt überall das grüne Rezeptbuch: Inventar, Werkbank, Ofen, Räucherofen, Schmelzofen

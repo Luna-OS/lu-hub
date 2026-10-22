@@ -87,6 +87,10 @@ public final class NightTheme {
 		if (path.startsWith("textures/gui/container/")) {
 			return vanilla || c.themeModdedContainers ? Kind.PANEL : null;
 		}
+		if (path.startsWith("textures/gui/sprites/") && path.endsWith(".png")) {
+			// manche Mods (z.B. Plasmo Voice) laden GUI-Sprites als einzelne Texturen statt aus dem Atlas
+			return spriteKind(Identifier.fromNamespaceAndPath(id.getNamespace(), path.substring(21, path.length() - 4)));
+		}
 		if (!vanilla || !path.startsWith("textures/gui/") || path.startsWith("textures/gui/sprites/")) {
 			return null;
 		}

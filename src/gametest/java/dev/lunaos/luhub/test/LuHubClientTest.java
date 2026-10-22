@@ -5,12 +5,18 @@ import dev.lunaos.luhub.config.HudElementType;
 import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.compat.ShulkerBoxTooltipCompat;
 import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
+import dev.lunaos.luhub.mixin.ButtonAccessor;
+import dev.lunaos.luhub.mixin.ImageButtonAccessor;
 import dev.lunaos.luhub.screen.ColorPickerScreen;
 import dev.lunaos.luhub.sort.Sorter;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
+import net.fabricmc.fabric.api.client.screen.v1.Screens;
+import net.minecraft.client.gui.components.AbstractWidget;
+import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.fabricmc.fabric.api.client.gametest.v1.context.ClientGameTestContext;
 import net.fabricmc.fabric.api.client.gametest.v1.context.TestSingleplayerContext;
 import com.mojang.blaze3d.platform.InputConstants;
@@ -87,6 +93,11 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.takeScreenshot("luhub-06c-food-tooltip");
 			dragInventoryWindow(context);
 			context.takeScreenshot("luhub-06e-window-moved");
+			checkRecipeButtonFollows(context);
+			toggleRecipeBook(context);
+			context.takeScreenshot("luhub-06f-recipe-book-moved");
+			checkRecipeButtonFollows(context);
+			toggleRecipeBook(context);
 			context.runOnClient(mc -> LuConfig.get().windowOffsets.clear());
 
 			context.setScreen(() -> new HudEditorScreen(null));
@@ -153,6 +164,18 @@ public final class LuHubClientTest implements FabricClientGameTest {
 				context.waitTicks(3);
 			}
 
+			if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("plasmovoice")) {
+				// Plasmo Voice: Einstellungen (Taste V) im Theme?
+				context.waitTicks(40);
+				context.takeScreenshot("luhub-16c-plasmo-voice-hud");
+				context.getInput().setCursorPos(5, 5);
+				context.getInput().pressKey(InputConstants.KEY_V);
+				context.waitTicks(20);
+				context.takeScreenshot("luhub-16d-plasmo-voice");
+				context.setScreen(() -> null);
+				context.waitTicks(3);
+			}
+
 			context.setScreen(() -> new PauseScreen(true));
 			context.waitTicks(5);
 			context.takeScreenshot("luhub-17-pause");
@@ -188,6 +211,41 @@ public final class LuHubClientTest implements FabricClientGameTest {
 		if (offset == null || offset[0] >= 0) {
 			throw new AssertionError("Fenster wurde nicht verschoben: " + (offset == null ? "null" : offset[0] + "," + offset[1]));
 		}
+	}
+
+	/** Axo (der Rezeptbuch-Knopf) muss nach dem Verschieben noch am selben Platz im Fenster sitzen. */
+	private static void checkRecipeButtonFollows(ClientGameTestContext context) {
+		String problem = context.computeOnClient(mc -> {
+			AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) mc.gui.screen();
+			AbstractWidget button = recipeButton(mc.gui.screen());
+			if (button == null) {
+				return null; // REI hat das Rezeptbuch ausgeblendet – dann zeichnet Lu Hub Axo selbst am Fenster
+			}
+			int expected = acc.luhub$getTopPos() + acc.luhub$getImageHeight() / 2 - 22;
+			return button.getY() == expected ? null : "Axo bei y=" + button.getY() + " statt " + expected;
+		});
+		if (problem != null) {
+			throw new AssertionError(problem);
+		}
+	}
+
+	private static void toggleRecipeBook(ClientGameTestContext context) {
+		context.runOnClient(mc -> {
+			AbstractWidget button = recipeButton(mc.gui.screen());
+			if (button instanceof Button b) {
+				((ButtonAccessor) b).luhub$getOnPress().onPress(b);
+			}
+		});
+		context.waitTicks(5);
+	}
+
+	private static AbstractWidget recipeButton(Screen screen) {
+		for (AbstractWidget widget : Screens.getWidgets(screen)) {
+			if (widget instanceof ImageButtonAccessor button && button.luhub$getSprites() == RecipeBookComponent.RECIPE_BUTTON_SPRITES) {
+				return widget;
+			}
+		}
+		return null;
 	}
 
 	/** Bewegt die Maus über einen Hotbar-Slot im Inventar, damit der Tooltip erscheint. */

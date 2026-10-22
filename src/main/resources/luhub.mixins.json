@@ -5,6 +5,8 @@
 	"client": [
 		"AbstractContainerScreenAccessor",
 		"AbstractContainerScreenMixin",
+		"AbstractRecipeBookScreenAccessor",
+		"AbstractRecipeBookScreenMixin",
 		"AdvancementsScreenMixin",
 		"ButtonAccessor",
 		"DebugScreenOverlayMixin",

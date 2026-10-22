@@ -60,6 +60,11 @@ dependencies {
 		gametestRuntimeOnly("maven.modrinth:ukulib:2.2.0+26.3-fabric") { transitive = false }
 	}
 
+	// ./gradlew runClientGameTest -PwithPlasmoVoice: Plasmo-Voice-Menüs und -Symbole im Theme testen
+	if (project.hasProperty('withPlasmoVoice')) {
+		gametestRuntimeOnly("maven.modrinth:plasmo-voice:vKP6gBRn") { transitive = false }
+	}
+
 	// ./gradlew runClientGameTest -PtutorialTrackerJar=/pfad/tutorial-tracker.jar: zusammen mit Tutorial Tracker testen
 	if (project.hasProperty('tutorialTrackerJar')) {
 		gametestRuntimeOnly files(project.property('tutorialTrackerJar'))
