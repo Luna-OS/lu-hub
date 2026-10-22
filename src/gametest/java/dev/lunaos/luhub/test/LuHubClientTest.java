@@ -29,6 +29,8 @@ import net.minecraft.network.chat.Component;
 public final class LuHubClientTest implements FabricClientGameTest {
 	@Override
 	public void runTest(ClientGameTestContext context) {
+		context.waitTicks(40);
+		context.takeScreenshot("luhub-00-title");
 		try (TestSingleplayerContext world = context.worldBuilder().create()) {
 			world.getServer().runCommand("gamemode survival @a");
 			world.getServer().runCommand("time set midnight");
@@ -83,6 +85,9 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.getInput().releaseShift();
 			hoverHotbarSlot(context, 1);
 			context.takeScreenshot("luhub-06c-food-tooltip");
+			dragInventoryWindow(context);
+			context.takeScreenshot("luhub-06e-window-moved");
+			context.runOnClient(mc -> LuConfig.get().windowOffsets.clear());
 
 			context.setScreen(() -> new HudEditorScreen(null));
 			context.waitTicks(5);
@@ -139,6 +144,15 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 			context.waitTicks(5);
 
+			if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("tutorialtracker")) {
+				// Tutorial Tracker (Luna-OS): Fenster im Theme?
+				context.getInput().pressKey(InputConstants.KEY_B);
+				context.waitTicks(10);
+				context.takeScreenshot("luhub-16b-tutorial-tracker");
+				context.setScreen(() -> null);
+				context.waitTicks(3);
+			}
+
 			context.setScreen(() -> new PauseScreen(true));
 			context.waitTicks(5);
 			context.takeScreenshot("luhub-17-pause");
@@ -151,6 +165,28 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			world.getServer().runCommand("setblock ~ ~1 ~ minecraft:water");
 			context.waitTicks(120);
 			context.takeScreenshot("luhub-11-air");
+		}
+	}
+
+	/** Zieht das Inventar an der Titelleiste nach links oben und prüft, dass die Position gespeichert wurde. */
+	private static void dragInventoryWindow(ClientGameTestContext context) {
+		double[] start = context.computeOnClient(mc -> {
+			AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) mc.gui.screen();
+			double scale = mc.getWindow().getGuiScale();
+			return new double[]{(acc.luhub$getLeftPos() + 60) * scale, (acc.luhub$getTopPos() + 3) * scale, scale};
+		});
+		context.getInput().setCursorPos(start[0], start[1]);
+		context.waitTicks(2);
+		context.getInput().holdMouse(InputConstants.MOUSE_BUTTON_LEFT);
+		for (int i = 0; i < 6; i++) {
+			context.getInput().moveCursor(-10 * start[2], -4 * start[2]);
+			context.waitTicks(1);
+		}
+		context.getInput().releaseMouse(InputConstants.MOUSE_BUTTON_LEFT);
+		context.waitTicks(5);
+		int[] offset = context.computeOnClient(mc -> LuConfig.get().windowOffsets.get(mc.gui.screen().getClass().getName()));
+		if (offset == null || offset[0] >= 0) {
+			throw new AssertionError("Fenster wurde nicht verschoben: " + (offset == null ? "null" : offset[0] + "," + offset[1]));
 		}
 	}
 

@@ -35,8 +35,9 @@ Java 25 wird benötigt (bringt der Minecraft-Launcher mit).
 
 | Taste | Funktion |
 |---|---|
-| `U` | Lu-Hub-Einstellungen |
-| `H` | HUD-Editor (Drag & Drop) |
+| `Y` | Lu-Hub-Einstellungen |
+| `G` | HUD-Editor (Drag & Drop) |
+| `R` | Sortieren (im Inventar/in Kisten, Bereich unter der Maus) |
 | `F3` | F3-Ansicht (die Taste lässt sich in den Lu-Hub-Einstellungen → F3 umbelegen) |
 | – | F3-Editor und zusätzliche F3-Taste (frei belegbar unter *Optionen → Steuerung → Lu Hub*) |
 
@@ -78,6 +79,18 @@ Außerdem: Klick auf den **Mond** oben rechts in jedem Inventar/Container öffne
 - Alle Farben (Hintergrund, Slots, Kanten, Sterne, Überschriften, Mond, Himmel) einstellbar,
   optional auch für Container anderer Mods
 - Weil die Texturen aus den aktuell geladenen Originalen erzeugt werden, funktionieren Resource-Packs darunter weiter
+
+### Fenster verschieben
+- Inventar, Kisten, Öfen, Shulkerkisten … an der **Titelleiste ziehen** (oder mit **Alt** irgendwo im Fenster)
+- Die Position wird pro Fenstertyp gespeichert, **Doppelklick** auf die Titelleiste setzt sie zurück
+- Rezeptbuch, REI, Sortier-Knöpfe und der Knopf von Tutorial Tracker wandern mit
+
+### Titelbildschirm
+Sternenhimmel-Schleier, Sternschnuppen und Mond über dem Panorama; Knöpfe im Theme.
+
+### Tutorial Tracker
+Die Fenster von Tutorial Tracker (Luna-OS) erscheinen automatisch im Nachthimmel-Theme.
+Belegt eine andere Mod dieselbe Taste wie Lu Hub, weicht Lu Hub beim Start auf eine freie Taste aus.
 
 ### Axo
 - Axo ersetzt überall das grüne Rezeptbuch: Inventar, Werkbank, Ofen, Räucherofen, Schmelzofen

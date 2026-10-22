@@ -58,6 +58,11 @@ dependencies {
 		gametestRuntimeOnly("maven.modrinth:ukulib:2.2.0+26.3-fabric") { transitive = false }
 	}
 
+	// ./gradlew runClientGameTest -PtutorialTrackerJar=/pfad/tutorial-tracker.jar: zusammen mit Tutorial Tracker testen
+	if (project.hasProperty('tutorialTrackerJar')) {
+		gametestRuntimeOnly files(project.property('tutorialTrackerJar'))
+	}
+
 	// Mod Menu ist optional (Einstellungs-Button in der Mod-Liste)
 	compileOnly("com.terraformersmc:modmenu:${project.modmenu_version}") { transitive = false }
 }
