@@ -160,5 +160,9 @@
   "luhub.sort.restock": "Auffüllen (passende Items ins Inventar)",
   "luhub.config.food_health_preview": "Heilungs-Vorschau",
   "luhub.config.hotbar_highlight": "Gewählten Slot aufhellen",
-  "luhub.config.color_selected_slot": "Gewählter Slot"
+  "luhub.config.color_selected_slot": "Gewählter Slot",
+  "luhub.config.title_screen": "Titelbildschirm",
+  "luhub.config.window_drag": "Fenster verschiebbar",
+  "luhub.config.reset_windows": "Fensterpositionen zurücksetzen",
+  "luhub.window.hint": "Titelleiste ziehen (oder Alt + ziehen) = verschieben · Doppelklick = zurücksetzen"
 }

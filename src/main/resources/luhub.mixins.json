@@ -6,6 +6,7 @@
 		"AbstractContainerScreenAccessor",
 		"AbstractContainerScreenMixin",
 		"AdvancementsScreenMixin",
+		"ButtonAccessor",
 		"DebugScreenOverlayMixin",
 		"FoodDataAccessor",
 		"GuiGraphicsExtractorMixin",
@@ -13,10 +14,12 @@
 		"HudMixin",
 		"ImageButtonAccessor",
 		"ItemStackMixin",
+		"RecipeBookComponentMixin",
 		"ScreenMixin",
 		"ShulkerBoxScreenMixin",
 		"SpriteContentsMixin",
-		"TextureContentsMixin"
+		"TextureContentsMixin",
+		"TitleScreenMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1

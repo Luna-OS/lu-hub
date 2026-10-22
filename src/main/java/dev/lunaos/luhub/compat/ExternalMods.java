@@ -11,6 +11,8 @@ public final class ExternalMods {
 	public static final boolean SHULKER_BOX_TOOLTIP = loaded("shulkerboxtooltip");
 	public static final boolean SORTED = loaded("sorted");
 	public static final boolean UKUS_ARMOR_HUD = loaded("ukus-armor-hud");
+	/** Tutorial Tracker (Luna-OS) – wird nicht ersetzt, sondern ans Theme angepasst. */
+	public static final boolean TUTORIAL_TRACKER = loaded("tutorialtracker");
 
 	private ExternalMods() {
 	}

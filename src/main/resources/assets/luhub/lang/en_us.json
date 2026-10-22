@@ -160,5 +160,9 @@
   "luhub.sort.restock": "Restock (matching items into inventory)",
   "luhub.config.food_health_preview": "Healing preview",
   "luhub.config.hotbar_highlight": "Brighten selected slot",
-  "luhub.config.color_selected_slot": "Selected slot"
+  "luhub.config.color_selected_slot": "Selected slot",
+  "luhub.config.title_screen": "Title screen",
+  "luhub.config.window_drag": "Movable windows",
+  "luhub.config.reset_windows": "Reset window positions",
+  "luhub.window.hint": "Drag the title bar (or Alt + drag) to move · double-click to reset"
 }

@@ -29,6 +29,12 @@ public final class LuConfig {
 	public boolean themeEnabled = true;
 	/** Theme auch für Menüs, Knöpfe, Tooltips, Toasts, Fortschritte – nicht nur für Container. */
 	public boolean themeAllGuis = true;
+	/** Sternenhimmel und Mond über dem Panorama im Titelbildschirm. */
+	public boolean titleScreenTheme = true;
+	/** Inventar, Kisten, Öfen ... per Drag &amp; Drop an der Titelleiste (oder mit Alt) verschieben. */
+	public boolean windowDrag = true;
+	/** Verschiebung je Fenstertyp (Klassenname des Screens) in GUI-Pixeln: [x, y]. */
+	public Map<String, int[]> windowOffsets = new java.util.HashMap<>();
 	/** Shulkerkisten-GUI in der Farbe der Shulkerkiste (im Theme-Stil). */
 	public boolean shulkerColors = true;
 	/** Auch Container-Texturen anderer Mods einfärben (textures/gui/container/ in fremden Namespaces). */
@@ -191,6 +197,10 @@ public final class LuConfig {
 			debugPanels = new LinkedHashMap<>();
 		}
 		debugPanels.values().removeIf(java.util.Objects::isNull);
+		if (windowOffsets == null) {
+			windowOffsets = new java.util.HashMap<>();
+		}
+		windowOffsets.values().removeIf(v -> v == null || v.length != 2);
 		for (DebugPanelConfig p : debugPanels.values()) {
 			if (p.anchor == null) {
 				p.anchor = Anchor.TOP_LEFT;

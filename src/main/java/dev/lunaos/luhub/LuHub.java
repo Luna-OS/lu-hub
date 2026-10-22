@@ -2,6 +2,7 @@ package dev.lunaos.luhub;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.lunaos.luhub.axo.AxoRenderer;
+import dev.lunaos.luhub.compat.TutorialTrackerCompat;
 import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.hud.LuHud;
 import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
@@ -9,10 +10,12 @@ import dev.lunaos.luhub.mixin.ImageButtonAccessor;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
+import dev.lunaos.luhub.screen.WindowDrag;
 import dev.lunaos.luhub.sort.SortButtons;
 import dev.lunaos.luhub.theme.ThemeDecor;
 import dev.lunaos.luhub.tooltip.LuTooltips;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientLifecycleEvents;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keymapping.v1.KeyMappingHelper;
 import net.fabricmc.fabric.api.client.screen.v1.ScreenEvents;
@@ -46,8 +49,8 @@ public final class LuHub implements ClientModInitializer {
 		LuConfig.load();
 		LuHud.register();
 
-		keySettings = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.settings", InputConstants.Type.KEYBOARD, InputConstants.KEY_U, CATEGORY));
-		keyHudEditor = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.hud_editor", InputConstants.Type.KEYBOARD, InputConstants.KEY_H, CATEGORY));
+		keySettings = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.settings", InputConstants.Type.KEYBOARD, InputConstants.KEY_Y, CATEGORY));
+		keyHudEditor = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.hud_editor", InputConstants.Type.KEYBOARD, InputConstants.KEY_G, CATEGORY));
 		keyDebugEditor = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.debug_editor", InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), CATEGORY));
 		keyDebugToggle = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.debug_toggle", InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), CATEGORY));
 
@@ -55,9 +58,66 @@ public final class LuHub implements ClientModInitializer {
 
 		LuTooltips.register();
 		SortButtons.register();
+		WindowDrag.register();
 		ClientTickEvents.END_CLIENT_TICK.register(LuHub::handleKeys);
+		ClientTickEvents.END_CLIENT_TICK.register(client -> TutorialTrackerCompat.tick());
+		ClientLifecycleEvents.CLIENT_STARTED.register(LuHub::resolveKeyConflicts);
 		registerContainerDecor();
 		LOGGER.info("Lu Hub geladen – gute Nacht, Axo!");
+	}
+
+	/**
+	 * Belegt eine andere Mod dieselbe Taste wie Lu Hub (z.B. Tutorial Tracker: H und U),
+	 * weicht Lu Hub auf eine freie Taste aus – so funktionieren beide.
+	 */
+	private static void resolveKeyConflicts(Minecraft mc) {
+		int[] candidates = {InputConstants.KEY_Y, InputConstants.KEY_G, InputConstants.KEY_N, InputConstants.KEY_Z,
+			InputConstants.KEY_F7, InputConstants.KEY_F8, InputConstants.KEY_F9};
+		boolean changed = false;
+		for (KeyMapping key : new KeyMapping[]{keySettings, keyHudEditor, keyDebugEditor, keyDebugToggle}) {
+			InputConstants.Key bound = KeyMappingHelper.getBoundKeyOf(key);
+			if (bound.equals(InputConstants.UNKNOWN) || !usedByOtherMod(mc, key, bound)) {
+				continue;
+			}
+			for (int code : candidates) {
+				InputConstants.Key candidate = InputConstants.Type.KEYBOARD.getOrCreate(code);
+				if (!usedByAny(mc, key, candidate)) {
+					LOGGER.info("Taste {} für {} ist schon von einer anderen Mod belegt – weiche auf {} aus",
+						bound.getName(), key.getName(), candidate.getName());
+					key.setKey(candidate);
+					changed = true;
+					break;
+				}
+			}
+		}
+		if (changed) {
+			KeyMapping.resetMapping();
+			mc.options.save();
+		}
+	}
+
+	private static boolean usedByOtherMod(Minecraft mc, KeyMapping self, InputConstants.Key key) {
+		for (KeyMapping other : mc.options.keyMappings) {
+			// Konflikte mit Vanilla-Tasten sind Absicht des Spielers – nur andere Mods zählen
+			if (other != self && !other.getName().startsWith("key.luhub.") && !isVanilla(other)
+				&& KeyMappingHelper.getBoundKeyOf(other).equals(key)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean usedByAny(Minecraft mc, KeyMapping self, InputConstants.Key key) {
+		for (KeyMapping other : mc.options.keyMappings) {
+			if (other != self && KeyMappingHelper.getBoundKeyOf(other).equals(key)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static boolean isVanilla(KeyMapping key) {
+		return key.getCategory().id().getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
 	}
 
 	private static void handleKeys(Minecraft mc) {

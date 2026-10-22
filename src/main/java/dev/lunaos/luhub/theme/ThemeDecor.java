@@ -63,6 +63,32 @@ public final class ThemeDecor {
 		}
 	}
 
+	/** Titelbildschirm: halbtransparenter Nachthimmel über dem Panorama, Sterne und ein großer Mond. */
+	public static void extractTitleSky(GuiGraphicsExtractor graphics, int width, int height) {
+		LuConfig c = LuConfig.get();
+		if (!c.themeEnabled || !c.titleScreenTheme) {
+			return;
+		}
+		int top = ARGB.color(170, c.colorSkyTop & 0xFFFFFF);
+		int bottom = ARGB.color(90, c.colorSkyBottom & 0xFFFFFF);
+		graphics.fillGradient(0, 0, width, height, top, bottom);
+		if (c.stars) {
+			double time = Util.getMillis() / 1000.0;
+			int count = (int) (width * height / 900 * Math.max(0.2f, c.starDensity));
+			for (int i = 0; i < count; i++) {
+				int x = (int) (NightTheme.hash(i, 1, 13) * width);
+				// Sterne vor allem im oberen Himmel
+				float fy = NightTheme.hash(i, 2, 13);
+				int y = (int) (fy * fy * height * 0.8f);
+				float twinkle = (float) (0.5 + 0.5 * Math.sin(time * (0.6f + NightTheme.hash(i, 4, 13) * 1.8f) + NightTheme.hash(i, 3, 13) * 6.283f));
+				graphics.fill(x, y, x + 1, y + 1, ARGB.color((int) (60 + 195 * twinkle), c.colorStar & 0xFFFFFF));
+			}
+			extractShootingStar(graphics, width, height, time, c.colorStar);
+		}
+		int moonSize = Math.max(16, height / 9);
+		extractMoon(graphics, width - moonSize - Math.max(12, width / 30), Math.max(10, height / 25), moonSize, c.colorMoon, false);
+	}
+
 	/** Position des Mondes oben rechts im Container-Fenster. */
 	public static int moonX(AbstractContainerScreen<?> screen) {
 		AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) screen;
@@ -107,7 +133,12 @@ public final class ThemeDecor {
 			}
 		}
 		// kleine Krater
-		graphics.fill(x + 2, y + 5, x + 3, y + 6, shade);
-		graphics.fill(x + 3, y + 8, x + 4, y + 9, shade);
+		int crater = Math.max(1, size / 11);
+		int c1x = x + Math.round(size * 0.2f);
+		int c1y = y + Math.round(size * 0.45f);
+		int c2x = x + Math.round(size * 0.3f);
+		int c2y = y + Math.round(size * 0.72f);
+		graphics.fill(c1x, c1y, c1x + crater, c1y + crater, shade);
+		graphics.fill(c2x, c2y, c2x + crater, c2y + crater, shade);
 	}
 }

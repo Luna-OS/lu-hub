@@ -13,6 +13,15 @@ public interface AbstractContainerScreenAccessor {
 	@Accessor("topPos")
 	int luhub$getTopPos();
 
+	@Accessor("leftPos")
+	void luhub$setLeftPos(int leftPos);
+
+	@Accessor("topPos")
+	void luhub$setTopPos(int topPos);
+
+	@Accessor("titleLabelY")
+	int luhub$getTitleLabelY();
+
 	@Accessor("imageWidth")
 	int luhub$getImageWidth();
 

@@ -188,6 +188,11 @@ public final class LuConfigScreen extends Screen {
 		toggle("luhub.config.debug_enabled", c.debugEnabled, v -> c.debugEnabled = v);
 		toggle("luhub.config.theme_enabled", c.themeEnabled, v -> c.themeEnabled = v, true);
 		toggle("luhub.config.axo_enabled", c.axoEnabled, v -> c.axoEnabled = v);
+		toggle("luhub.config.window_drag", c.windowDrag, v -> c.windowDrag = v);
+		button("luhub.config.reset_windows", b -> {
+			c.windowOffsets.clear();
+			LuConfig.save();
+		});
 		skipToNewRow();
 		addWide(Button.builder(Component.translatable("luhub.config.controls"), b -> minecraft.gui.setScreen(new KeyBindsScreen(this, minecraft.options)))
 			.bounds(0, 0, 100, 20).build());
@@ -290,6 +295,7 @@ public final class LuConfigScreen extends Screen {
 		toggle("luhub.config.theme_recipe_book", c.themeRecipeBook, v -> c.themeRecipeBook = v, true);
 		toggle("luhub.config.theme_modded", c.themeModdedContainers, v -> c.themeModdedContainers = v, true);
 		toggle("luhub.config.night_background", c.nightBackground, v -> c.nightBackground = v);
+		toggle("luhub.config.title_screen", c.titleScreenTheme, v -> c.titleScreenTheme = v);
 		toggle("luhub.config.moon", c.moonDecoration, v -> c.moonDecoration = v);
 		toggle("luhub.config.stars", c.stars, v -> c.stars = v, true);
 		slider("luhub.config.star_density", 0f, 4f, 0.1f, () -> c.starDensity, v -> {
