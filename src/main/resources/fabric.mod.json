@@ -19,6 +19,9 @@
 		],
 		"modmenu": [
 			"dev.lunaos.luhub.compat.modmenu.LuModMenu"
+		],
+		"rei_client": [
+			"dev.lunaos.luhub.compat.rei.LuReiPlugin"
 		]
 	},
 	"mixins": [

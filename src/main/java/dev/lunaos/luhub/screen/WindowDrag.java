@@ -45,8 +45,27 @@ public final class WindowDrag {
 		return offset != null && LuConfig.get().windowDrag ? offset : new int[]{0, 0};
 	}
 
+	/** Ursprüngliche linke obere Ecke je Fenster (vor der Verschiebung) – für REI. */
+	private static final Map<AbstractContainerScreen<?>, int[]> UNMOVED = new WeakHashMap<>();
+
+	/**
+	 * Grenzen des Fensters, wie sie ohne Verschiebung wären: [x, y, Breite, Höhe] – oder null, wenn es nicht verschoben ist.
+	 * REI richtet sich danach und bleibt so an seinem Platz.
+	 */
+	public static int[] unmovedBounds(AbstractContainerScreen<?> screen) {
+		int[] base = UNMOVED.get(screen);
+		int[] offset = offset(screen);
+		if (base == null || (offset[0] == 0 && offset[1] == 0 && dragging != screen)) {
+			return null;
+		}
+		AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) screen;
+		return new int[]{base[0], base[1], acc.luhub$getImageWidth(), acc.luhub$getImageHeight()};
+	}
+
 	/** Am Ende von AbstractContainerScreen.init: gespeicherte Verschiebung anwenden (im Bildschirm gehalten). */
 	public static void applyOffset(AbstractContainerScreen<?> screen) {
+		AbstractContainerScreenAccessor baseAcc = (AbstractContainerScreenAccessor) screen;
+		UNMOVED.put(screen, new int[]{baseAcc.luhub$getLeftPos(), baseAcc.luhub$getTopPos()});
 		int[] offset = offset(screen);
 		if (offset[0] == 0 && offset[1] == 0) {
 			return;
@@ -62,6 +81,10 @@ public final class WindowDrag {
 	public static int offsetLeft(int leftPos, int screenWidth, int imageWidth) {
 		if (!(Minecraft.getInstance().gui.screen() instanceof AbstractContainerScreen<?> screen)) {
 			return leftPos;
+		}
+		int[] base = UNMOVED.get(screen);
+		if (base != null) {
+			base[0] = leftPos; // Fenster mit Rezeptbuch: das ist die eigentliche Ausgangsposition
 		}
 		return clamp(leftPos + offset(screen)[0], screenWidth - imageWidth);
 	}
