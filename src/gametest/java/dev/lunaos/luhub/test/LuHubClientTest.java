@@ -12,6 +12,7 @@ import dev.lunaos.luhub.sort.Sorter;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
+import dev.lunaos.luhub.screen.TooltipEditorScreen;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
 import net.minecraft.client.gui.components.AbstractWidget;
@@ -23,13 +24,23 @@ import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.PauseScreen;
 import net.minecraft.client.gui.screens.advancements.AdvancementsScreen;
+import net.minecraft.client.gui.screens.inventory.AnvilScreen;
+import net.minecraft.client.gui.screens.inventory.BrewingStandScreen;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.client.gui.screens.inventory.EnchantmentScreen;
 import net.minecraft.client.gui.screens.inventory.CraftingScreen;
 import net.minecraft.client.gui.screens.inventory.ShulkerBoxScreen;
 import net.minecraft.client.gui.screens.inventory.FurnaceScreen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.TooltipFlag;
+
+import java.util.List;
 
 /** Startet eine Testwelt und macht Screenshots aller Lu-Hub-Features. */
 public final class LuHubClientTest implements FabricClientGameTest {
@@ -91,6 +102,9 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.getInput().releaseShift();
 			hoverHotbarSlot(context, 1);
 			context.takeScreenshot("luhub-06c-food-tooltip");
+			hoverHotbarSlot(context, 0);
+			context.takeScreenshot("luhub-06g-tooltip-infos");
+			checkFuelTooltip(context);
 			dragInventoryWindow(context);
 			context.takeScreenshot("luhub-06e-window-moved");
 			checkRecipeButtonFollows(context);
@@ -111,6 +125,10 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.setScreen(() -> new LuConfigScreen(null));
 			context.waitTicks(5);
 			context.takeScreenshot("luhub-09-config");
+
+			context.setScreen(() -> new TooltipEditorScreen(null));
+			context.waitTicks(5);
+			context.takeScreenshot("luhub-09b-tooltip-editor");
 
 			context.setScreen(() -> new ColorPickerScreen(null, Component.literal("Herzen"), 0xFFE86AA8, c -> { }));
 			context.waitTicks(5);
@@ -154,6 +172,54 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.takeScreenshot("luhub-16-crafting-axo");
 			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
 			context.waitTicks(5);
+
+			// Alle Arbeitsblöcke verschoben: das ganze Fenster (Hintergrund!) muss mitwandern, nicht nur Items und Text
+			context.runOnClient(mc -> {
+				for (Class<?> type : List.of(ContainerScreen.class, ShulkerBoxScreen.class, CraftingScreen.class, FurnaceScreen.class,
+					BrewingStandScreen.class, AnvilScreen.class, EnchantmentScreen.class)) {
+					LuConfig.get().windowOffsets.put(type.getName(), new int[]{-70, 30});
+				}
+			});
+			openContainer(context, new BlockPos(0, -60, 2), ShulkerBoxScreen.class);
+			context.takeScreenshot("luhub-19-moved-shulker");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(2, -60, 2), CraftingScreen.class);
+			context.takeScreenshot("luhub-19b-moved-crafting");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(-2, -60, 0), FurnaceScreen.class);
+			context.takeScreenshot("luhub-19c-moved-furnace");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			world.getServer().runCommand("setblock 2 -60 0 minecraft:chest[facing=west,type=right]{Items:[{Slot:0b,id:\"minecraft:diamond\",count:12}]}");
+			world.getServer().runCommand("setblock 2 -60 1 minecraft:chest[facing=west,type=left]{Items:[{Slot:5b,id:\"minecraft:emerald\",count:9}]}");
+			world.getServer().runCommand("setblock 2 -60 2 minecraft:ender_chest[facing=west]");
+			world.getServer().runCommand("setblock -2 -60 0 minecraft:brewing_stand");
+			world.getServer().runCommand("setblock 0 -60 -2 minecraft:anvil");
+			world.getServer().runCommand("setblock 0 -60 2 minecraft:enchanting_table");
+			context.waitTicks(10);
+			openContainer(context, new BlockPos(2, -60, 0), ContainerScreen.class);
+			context.takeScreenshot("luhub-19d-moved-large-chest");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(2, -60, 2), ContainerScreen.class);
+			context.takeScreenshot("luhub-19e-moved-ender-chest");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(-2, -60, 0), BrewingStandScreen.class);
+			context.takeScreenshot("luhub-19f-moved-brewing");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(0, -60, -2), AnvilScreen.class);
+			context.takeScreenshot("luhub-19g-moved-anvil");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			openContainer(context, new BlockPos(0, -60, 2), EnchantmentScreen.class);
+			context.takeScreenshot("luhub-19h-moved-enchanting");
+			context.getInput().pressKey(InputConstants.KEY_ESCAPE);
+			context.waitTicks(5);
+			context.runOnClient(mc -> LuConfig.get().windowOffsets.clear());
 
 			if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("tutorialtracker")) {
 				// Tutorial Tracker (Luna-OS): Fenster im Theme?
@@ -210,6 +276,16 @@ public final class LuHubClientTest implements FabricClientGameTest {
 		int[] offset = context.computeOnClient(mc -> LuConfig.get().windowOffsets.get(mc.gui.screen().getClass().getName()));
 		if (offset == null || offset[0] >= 0) {
 			throw new AssertionError("Fenster wurde nicht verschoben: " + (offset == null ? "null" : offset[0] + "," + offset[1]));
+		}
+	}
+
+	/** Kohle muss im Tooltip ihre Brenndauer zeigen. */
+	private static void checkFuelTooltip(ClientGameTestContext context) {
+		boolean fuel = context.computeOnClient(mc -> new ItemStack(Items.COAL)
+			.getTooltipLines(Item.TooltipContext.of(mc.level), mc.player, TooltipFlag.NORMAL).stream()
+			.anyMatch(line -> line.getContents() instanceof TranslatableContents t && t.getKey().equals("luhub.tooltip.fuel")));
+		if (!fuel) {
+			throw new AssertionError("Brennstoff-Info fehlt im Tooltip von Kohle");
 		}
 	}
 

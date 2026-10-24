@@ -10,8 +10,9 @@ Alles in einer Mod – im Nachthimmel- & Mond-Theme mit Axo 🌙
 - **HUD im eigenen Theme:** Herzen, Hunger, Luftblasen, XP-Leiste, Rüstung und Hotbar – frei verschieben & per Ecke größer/kleiner ziehen (Taste `G`), Pride-Varianten, ausgewählter Hotbar-Slot heller
 - **Theme überall:** Inventar, Kisten, Öfen, Menüs, Knöpfe, Tooltips, Titelbildschirm; Shulker-GUIs in der Farbe der Shulkerkiste
 - **Axo** – animiert, ersetzt überall das grüne Rezeptbuch
-- **Inventar-Fenster verschieben** per Drag & Drop (Titelleiste oder Alt) – Axo und das Rezeptbuch wandern mit, REI bleibt an seinem Platz
+- **Inventar-Fenster verschieben** per Drag & Drop (Titelleiste oder Alt) – bei allen Arbeitsblöcken wandert das ganze Fenster samt Axo und Rezeptbuch mit, REI bleibt an seinem Platz
 - **Eingebaut:** AppleSkin (inkl. Heil-Vorschau), Shulker Box Tooltip, Sorted (Sortieren mit `R`), uku's Armor HUD
+- **Tooltip-Editor:** Haltbarkeit, Anzahl im Inventar, Brennstoff, Kompost, Reparatur-Material und mehr im Tooltip – einzeln an/aus, einfärbbar und per Drag & Drop sortierbar
 - **Plasmo Voice:** Einstellungsmenü im Nachthimmel-Theme
 - Kompatibel mit REI, AppleSkin, Shulker Box Tooltip, Sorted, uku's Armor HUD, Plasmo Voice und Tutorial Tracker, falls installiert
 

@@ -30,7 +30,7 @@ import java.util.function.Supplier;
 
 /** Einstellungen von Lu Hub, aufgeteilt in Tabs. */
 public final class LuConfigScreen extends Screen {
-	private enum Tab { GENERAL, HUD, DEBUG, THEME, AXO, EXTRAS }
+	private enum Tab { GENERAL, HUD, DEBUG, THEME, AXO, TOOLTIPS, EXTRAS }
 
 	private static final int ROW = 24;
 	private static final int COLUMN_WIDTH = 150;
@@ -85,6 +85,7 @@ public final class LuConfigScreen extends Screen {
 			case DEBUG -> buildDebug();
 			case THEME -> buildTheme();
 			case AXO -> buildAxo();
+			case TOOLTIPS -> buildTooltips();
 			case EXTRAS -> buildExtras();
 		}
 		if (nextColumn != 0) {
@@ -352,6 +353,20 @@ public final class LuConfigScreen extends Screen {
 		if (ExternalMods.APPLESKIN || ExternalMods.SHULKER_BOX_TOOLTIP || ExternalMods.SORTED || ExternalMods.UKUS_ARMOR_HUD) {
 			addWide(Button.builder(Component.translatable("luhub.config.external_hint"), b -> { }).bounds(0, 0, 100, 20).build()).active = false;
 		}
+	}
+
+	private void buildTooltips() {
+		LuConfig c = LuConfig.get();
+		addWide(Button.builder(Component.translatable("luhub.config.tooltip_editor"), b -> {
+			LuConfig.save();
+			minecraft.gui.setScreen(new TooltipEditorScreen(this));
+		}).bounds(0, 0, 100, 20).build());
+		toggle("luhub.config.tooltip_infos", c.tooltipInfos, v -> c.tooltipInfos = v);
+		toggle("luhub.config.tooltip_shift", c.tooltipInfosShift, v -> c.tooltipInfosShift = v);
+		toggle("luhub.config.tooltip_hide_attributes", c.tooltipHideAttributes, v -> c.tooltipHideAttributes = v);
+		toggle("luhub.config.food_tooltip", c.foodTooltip, v -> c.foodTooltip = v).active = !ExternalMods.APPLESKIN;
+		toggle("luhub.config.shulker_preview", c.shulkerPreview, v -> c.shulkerPreview = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;
+		toggle("luhub.config.shulker_hide_lines", c.shulkerPreviewHideLines, v -> c.shulkerPreviewHideLines = v).active = !ExternalMods.SHULKER_BOX_TOOLTIP;
 	}
 
 	private void buildAxo() {

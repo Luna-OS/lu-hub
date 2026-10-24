@@ -83,6 +83,7 @@ Außerdem: Klick auf den **Mond** oben rechts in jedem Inventar/Container öffne
 ### Fenster verschieben
 - Inventar, Kisten, Öfen, Shulkerkisten … an der **Titelleiste ziehen** (oder mit **Alt** irgendwo im Fenster)
 - Die Position wird pro Fenstertyp gespeichert, **Doppelklick** auf die Titelleiste setzt sie zurück
+- Das ganze Fenster wandert mit – bei allen Arbeitsblöcken (Kisten, Ender-Truhe, Shulker, Werkbank, Öfen, Braustand, Amboss, Zaubertisch, Händler, Leuchtfeuer, Trichter, Werfer, Crafter, Schleifstein, Reittiere)
 - Axo, das Rezeptbuch, die Sortier-Knöpfe und der Knopf von Tutorial Tracker wandern mit – REI bleibt an seinem Platz
 
 ### Titelbildschirm
@@ -91,6 +92,15 @@ Sternenhimmel-Schleier, Sternschnuppen und Mond über dem Panorama; Knöpfe im T
 ### Tutorial Tracker
 Die Fenster von Tutorial Tracker (Luna-OS) erscheinen automatisch im Nachthimmel-Theme.
 Belegt eine andere Mod dieselbe Taste wie Lu Hub, weicht Lu Hub beim Start auf eine freie Taste aus.
+
+### Tooltips
+Nützliche Zusatz-Infos direkt im Item-Tooltip – alles einzeln an-/abschaltbar, einfärbbar und per Drag & Drop sortierbar
+im **Tooltip-Editor** (Einstellungen → Tooltips) mit Live-Vorschau:
+- Haltbarkeit (Zahl + Prozent, von Grün nach Rot), Anzahl im Inventar und im offenen Behälter
+- Reparatur-Material und Amboss-Aufschlag
+- Brennstoff für Ofen (wie viele Items) und Braustand, Kompostier-Chance
+- Leuchtkraft, Stapelgröße, Verzauberbarkeit, Explosionsfestigkeit, Hunger/Sättigung als Text, Mod-Name, Item-ID
+- Optional nur mit gedrückter Shift-Taste; Angriffswerte („Wenn in der Haupthand“) lassen sich ausblenden
 
 ### Plasmo Voice
 Das Einstellungsmenü von Plasmo Voice (Taste `V`) erscheint mit Knöpfen, Reitern, Schiebern und Hintergrund im Nachthimmel-Theme.

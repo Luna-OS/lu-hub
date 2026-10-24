@@ -114,6 +114,12 @@ public final class WindowDrag {
 		return new int[]{left - baseLeft, clamp(baseTop + offset[1], screen.height - height) - baseTop};
 	}
 
+	/** Wie weit das Fenster gerade waagerecht aus der Mitte verschoben ist (für Fenster, die mit der Bildschirmmitte rechnen). */
+	public static int shiftX(AbstractContainerScreen<?> screen) {
+		AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) screen;
+		return acc.luhub$getLeftPos() - (screen.width - acc.luhub$getImageWidth()) / 2;
+	}
+
 	/** Wie weit das Fenster gerade senkrecht verschoben ist (für Knöpfe, die an der Bildschirmmitte hängen). */
 	public static int shiftY(AbstractContainerScreen<?> screen) {
 		AbstractContainerScreenAccessor acc = (AbstractContainerScreenAccessor) screen;

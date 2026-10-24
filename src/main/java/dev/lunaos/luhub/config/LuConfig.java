@@ -12,9 +12,13 @@ import java.io.Writer;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Alle Einstellungen von Lu Hub. Wird als config/luhub.json gespeichert.
@@ -81,6 +85,16 @@ public final class LuConfig {
 	public boolean armorShowHands = true;
 	public int armorWarnPercent = 10;
 	public boolean armorWarnSound = true;
+
+	// ---------- Tooltips ----------
+	/** Zusatz-Infos in Item-Tooltips (Haltbarkeit, Anzahl im Inventar, Brennstoff ...). */
+	public boolean tooltipInfos = true;
+	/** Zusatz-Infos erst mit gedrückter Shift-Taste zeigen. */
+	public boolean tooltipInfosShift = false;
+	/** "Wenn in der Haupthand:" mit Angriffs- und Rüstungswerten ausblenden. */
+	public boolean tooltipHideAttributes = false;
+	/** Reihenfolge, Sichtbarkeit und Farbe der Zusatz-Zeilen. */
+	public List<TooltipInfoConfig> tooltipLines = new ArrayList<>();
 
 	// ---------- HUD ----------
 	public boolean hudEnabled = true;
@@ -160,6 +174,25 @@ public final class LuConfig {
 		c.starDensity = d.starDensity;
 	}
 
+	public static void resetTooltips() {
+		instance.tooltipLines = new ArrayList<>();
+		instance.fillTooltipDefaults();
+	}
+
+	/** Fehlende Tooltip-Zeilen ergänzen (z.B. nach einem Update), Doppelte und Unbekannte entfernen. */
+	private void fillTooltipDefaults() {
+		if (tooltipLines == null) {
+			tooltipLines = new ArrayList<>();
+		}
+		Set<String> seen = new HashSet<>();
+		tooltipLines.removeIf(l -> l == null || dev.lunaos.luhub.tooltip.TooltipInfo.byId(l.id) == null || !seen.add(l.id));
+		for (dev.lunaos.luhub.tooltip.TooltipInfo info : dev.lunaos.luhub.tooltip.TooltipInfo.values()) {
+			if (seen.add(info.name())) {
+				tooltipLines.add(new TooltipInfoConfig(info));
+			}
+		}
+	}
+
 	public static void resetHudLayout() {
 		for (HudElementType type : HudElementType.values()) {
 			HudElementConfig e = instance.hud(type);
@@ -193,6 +226,7 @@ public final class LuConfig {
 			}
 			e.scale = Math.clamp(e.scale, 0.25f, 4f);
 		}
+		fillTooltipDefaults();
 		if (debugPanels == null) {
 			debugPanels = new LinkedHashMap<>();
 		}

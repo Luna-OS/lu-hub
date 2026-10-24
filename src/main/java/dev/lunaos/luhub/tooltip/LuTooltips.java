@@ -59,6 +59,7 @@ public final class LuTooltips {
 				// die Vanilla-Zeilen "Diamant x12", "und 3 weitere ..." ersetzt die Vorschau
 				lines.removeIf(LuTooltips::isContainerLine);
 			}
+			TooltipInfos.append(stack, flag, lines);
 		});
 	}
 
