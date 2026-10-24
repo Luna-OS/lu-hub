@@ -190,6 +190,7 @@ public final class LuConfigScreen extends Screen {
 		toggle("luhub.config.theme_enabled", c.themeEnabled, v -> c.themeEnabled = v, true);
 		toggle("luhub.config.axo_enabled", c.axoEnabled, v -> c.axoEnabled = v);
 		toggle("luhub.config.window_drag", c.windowDrag, v -> c.windowDrag = v);
+		toggle("luhub.config.no_auto_pause", c.noAutoPause, v -> c.noAutoPause = v);
 		button("luhub.config.reset_windows", b -> {
 			c.windowOffsets.clear();
 			LuConfig.save();

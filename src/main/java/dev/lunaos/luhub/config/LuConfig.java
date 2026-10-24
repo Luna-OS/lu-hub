@@ -39,6 +39,8 @@ public final class LuConfig {
 	public boolean windowDrag = true;
 	/** Verschiebung je Fenstertyp (Klassenname des Screens) in GUI-Pixeln: [x, y]. */
 	public Map<String, int[]> windowOffsets = new java.util.HashMap<>();
+	/** Beim Raustabben nicht automatisch das Pausemenü öffnen. */
+	public boolean noAutoPause = true;
 	/** Shulkerkisten-GUI in der Farbe der Shulkerkiste (im Theme-Stil). */
 	public boolean shulkerColors = true;
 	/** Auch Container-Texturen anderer Mods einfärben (textures/gui/container/ in fremden Namespaces). */

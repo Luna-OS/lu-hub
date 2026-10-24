@@ -242,6 +242,26 @@ public final class LuHubClientTest implements FabricClientGameTest {
 				context.waitTicks(3);
 			}
 
+			if (net.fabricmc.loader.api.FabricLoader.getInstance().isModLoaded("roughlyenoughitems")) {
+				// REI: Erz-Höhen, Dorfbewohner-Berufe und -Handel
+				checkVanillaTradeFallback(context);
+				openRei(context, "ore_heights", null);
+				context.takeScreenshot("luhub-20-rei-ores");
+				openRei(context, "ore_heights", Items.DIAMOND);
+				context.takeScreenshot("luhub-20b-rei-diamond");
+				openRei(context, "ore_heights", Items.RAW_GOLD);
+				context.takeScreenshot("luhub-20c-rei-gold");
+				openRei(context, "villager_professions", null);
+				context.takeScreenshot("luhub-21-rei-professions");
+				context.getInput().setCursorPos(884, 354); // das "!" rechts neben dem Display
+				context.waitTicks(5);
+				context.takeScreenshot("luhub-21c-rei-hint");
+				openRei(context, "villager_trades", Items.ENCHANTED_BOOK);
+				context.takeScreenshot("luhub-21b-rei-trades");
+				context.setScreen(() -> null);
+				context.waitTicks(3);
+			}
+
 			context.setScreen(() -> new PauseScreen(true));
 			context.waitTicks(5);
 			context.takeScreenshot("luhub-17-pause");
@@ -277,6 +297,64 @@ public final class LuHubClientTest implements FabricClientGameTest {
 		if (offset == null || offset[0] >= 0) {
 			throw new AssertionError("Fenster wurde nicht verschoben: " + (offset == null ? "null" : offset[0] + "," + offset[1]));
 		}
+	}
+
+	/** Auf Servern baut Lu Hub die Vanilla-Handel selbst – das muss auch ohne eingebauten Server klappen. */
+	@SuppressWarnings("unchecked")
+	private static void checkVanillaTradeFallback(ClientGameTestContext context) {
+		String problem = context.computeOnClient(mc -> {
+			try {
+				Class<?> data = Class.forName("dev.lunaos.luhub.compat.rei.VillagerTradeData");
+				var build = data.getDeclaredMethod("vanillaTrades", net.minecraft.core.RegistryAccess.class);
+				build.setAccessible(true);
+				var trades = (java.util.Map<net.minecraft.resources.Identifier, ?>) build.invoke(null, mc.level.registryAccess());
+				var read = data.getDeclaredMethod("readTag", net.minecraft.resources.Identifier.class, java.util.Set.class);
+				read.setAccessible(true);
+				var ids = (List<net.minecraft.resources.Identifier>) read.invoke(null,
+					net.minecraft.resources.Identifier.parse("minecraft:armorer/level_1"), new java.util.LinkedHashSet<>());
+				if (trades.size() < 100) {
+					return "nur " + trades.size() + " Vanilla-Handel gebaut";
+				}
+				if (ids.size() < 4 || !trades.keySet().containsAll(ids)) {
+					return "Rüstungsschmied Stufe 1 unvollständig: " + ids;
+				}
+				return null;
+			} catch (ReflectiveOperationException e) {
+				return e.toString();
+			}
+		});
+		if (problem != null) {
+			throw new AssertionError("Handel ohne Server: " + problem);
+		}
+	}
+
+	/** Öffnet eine Lu-Hub-Kategorie in REI (per Reflection, REI ist nur zur Laufzeit dabei). */
+	private static void openRei(ClientGameTestContext context, String category, net.minecraft.world.level.ItemLike recipesFor) {
+		boolean opened = context.computeOnClient(mc -> {
+			try {
+				Class<?> builderType = Class.forName("me.shedaniel.rei.api.client.view.ViewSearchBuilder");
+				Class<?> idType = Class.forName("me.shedaniel.rei.api.common.category.CategoryIdentifier");
+				Object id = idType.getMethod("of", String.class, String.class).invoke(null, "luhub", category);
+				Object builder = builderType.getMethod("builder").invoke(null);
+				if (recipesFor != null) {
+					Object stack = Class.forName("me.shedaniel.rei.api.common.util.EntryStacks")
+						.getMethod("of", net.minecraft.world.level.ItemLike.class).invoke(null, recipesFor);
+					builder = builderType.getMethod("addRecipesFor", Class.forName("me.shedaniel.rei.api.common.entry.EntryStack")).invoke(builder, stack);
+					builder = builderType.getMethod("filterCategory", idType).invoke(builder, id);
+				} else {
+					builder = builderType.getMethod("addCategory", idType).invoke(builder, id);
+				}
+				return (Boolean) builderType.getMethod("open").invoke(builder);
+			} catch (ReflectiveOperationException e) {
+				throw new RuntimeException(e);
+			}
+		});
+		if (!opened) {
+			throw new AssertionError("REI-Kategorie " + category + " ließ sich nicht öffnen (keine Displays?)");
+		}
+		context.waitTicks(10);
+		context.getInput().setCursorPos(2, 2);
+		context.waitTicks(2);
 	}
 
 	/** Kohle muss im Tooltip ihre Brenndauer zeigen. */

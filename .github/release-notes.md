@@ -13,6 +13,8 @@ Alles in einer Mod – im Nachthimmel- & Mond-Theme mit Axo 🌙
 - **Inventar-Fenster verschieben** per Drag & Drop (Titelleiste oder Alt) – bei allen Arbeitsblöcken wandert das ganze Fenster samt Axo und Rezeptbuch mit, REI bleibt an seinem Platz
 - **Eingebaut:** AppleSkin (inkl. Heil-Vorschau), Shulker Box Tooltip, Sorted (Sortieren mit `R`), uku's Armor HUD
 - **Tooltip-Editor:** Haltbarkeit, Anzahl im Inventar, Brennstoff, Kompost, Reparatur-Material und mehr im Tooltip – einzeln an/aus, einfärbbar und per Drag & Drop sortierbar
+- **REI-Seiten:** Erz-Höhen (Kurven je Erz, beste Höhe, Tipps), Dorfbewohner-Berufe und alle Dorfbewohner-Handel
+- **Kein Auto-Pause:** Raustabben öffnet nicht mehr das Pausemenü
 - **Plasmo Voice:** Einstellungsmenü im Nachthimmel-Theme
 - Kompatibel mit REI, AppleSkin, Shulker Box Tooltip, Sorted, uku's Armor HUD, Plasmo Voice und Tutorial Tracker, falls installiert
 

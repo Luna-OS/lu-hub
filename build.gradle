@@ -43,6 +43,7 @@ dependencies {
 	// REI-Plugin (nur geladen, wenn REI installiert ist): REI bleibt beim Verschieben von Fenstern stehen
 	compileOnly("me.shedaniel:RoughlyEnoughItems-api-fabric:${project.rei_version}") { transitive = false }
 	compileOnly("me.shedaniel.cloth:basic-math:0.6.1") { transitive = false }
+	compileOnly("dev.architectury:architectury-fabric:${project.architectury_version}") { transitive = false }
 
 	// REI wird im automatischen Spieltest mitgeladen, um die Kompatibilität zu prüfen (nicht im Mod enthalten)
 	gametestRuntimeOnly("me.shedaniel:RoughlyEnoughItems-fabric:${project.rei_version}") { transitive = false }

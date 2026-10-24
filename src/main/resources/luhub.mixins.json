@@ -16,12 +16,14 @@
 		"HudMixin",
 		"ImageButtonAccessor",
 		"ItemStackMixin",
+		"MinecraftMixin",
 		"RecipeBookComponentMixin",
 		"ScreenMixin",
 		"ShulkerBoxScreenMixin",
 		"SpriteContentsMixin",
 		"TextureContentsMixin",
-		"TitleScreenMixin"
+		"TitleScreenMixin",
+		"VillagerTradeAccessor"
 	],
 	"injectors": {
 		"defaultRequire": 1

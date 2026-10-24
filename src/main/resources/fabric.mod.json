@@ -20,6 +20,9 @@
 		"modmenu": [
 			"dev.lunaos.luhub.compat.modmenu.LuModMenu"
 		],
+		"rei_common": [
+			"dev.lunaos.luhub.compat.rei.LuReiCommonPlugin"
+		],
 		"rei_client": [
 			"dev.lunaos.luhub.compat.rei.LuReiPlugin"
 		]
