@@ -9,6 +9,7 @@ import dev.lunaos.luhub.mixin.FoodDataAccessor;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.core.component.DataComponents;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
@@ -148,21 +149,50 @@ public final class FoodInfo {
 			}
 			int x = baseX + (i % 10) * 8;
 			int y = baseY - (i / 10) * rowHeight;
-			boolean onlyRightHalf = now == 1;
-			boolean half = then == 1;
-			PixelIcon.HEART.draw(graphics, x, y, (ch, px, py) -> {
-				if (ch == '.') {
-					return 0;
-				}
-				if (ch == 'o') {
-					return ARGB.color(alpha, 0x2A0618);
-				}
-				if ((half && px > 4) || (onlyRightHalf && px <= 4)) {
-					return 0;
-				}
-				return ARGB.color(alpha, ch == 'h' ? 0xFFD0E8 : 0xFF7DB8);
-			});
+			PixelIcon.HEART.blit(graphics, healPreviewHeart(now == 1, then == 1), x, y, ARGB.color(alpha, 0xFFFFFF));
 		}
+	}
+
+	/**
+	 * Herz der Heil-Vorschau, deckend gebacken – die pulsierende Deckkraft kommt beim Zeichnen dazu.
+	 * @param onlyRightHalf das Herz ist schon halb voll, nur die rechte Hälfte kommt dazu
+	 * @param half          nach dem Essen nur halb voll
+	 */
+	private static Identifier healPreviewHeart(boolean onlyRightHalf, boolean half) {
+		int index = (onlyRightHalf ? 2 : 0) + (half ? 1 : 0);
+		return PixelIcon.HEART.fixed(HEAL_KEYS[index], HEAL_PAINTERS[index]);
+	}
+
+	private static final String[] HEAL_KEYS = {"heal_full", "heal_half", "heal_right", "heal_right_half"};
+	private static final PixelIcon.Painter[] HEAL_PAINTERS = {
+		healPainter(false, false), healPainter(false, true), healPainter(true, false), healPainter(true, true)
+	};
+
+	private static PixelIcon.Painter healPainter(boolean onlyRightHalf, boolean half) {
+		return (ch, px, py) -> {
+			if (ch == '.') {
+				return 0;
+			}
+			if (ch == 'o') {
+				return 0xFF2A0618;
+			}
+			if ((half && px > 4) || (onlyRightHalf && px <= 4)) {
+				return 0;
+			}
+			return ch == 'h' ? 0xFFFFD0E8 : 0xFFFF7DB8;
+		};
+	}
+
+	/** Keule der Essens-Vorschau (deckend), optional ohne die linke Hälfte. */
+	private static int previewFood(char ch, boolean skip) {
+		if (ch == '.' || (skip && ch != 'o')) {
+			return 0;
+		}
+		return switch (ch) {
+			case 'o' -> 0xFF2A1A06;
+			case 'w' -> 0xFFF4F0FF;
+			default -> 0xFFFFC46B;
+		};
 	}
 
 	/** Wird vor den Hunger-Keulen gezeichnet. */
@@ -207,17 +237,10 @@ public final class FoodInfo {
 				if (halvesNew > halvesNow) {
 					int x = right - i * 8 - 9;
 					int alpha = Math.round(flash * 255);
-					boolean half = halvesNew == 1;
-					PixelIcon.FOOD.draw(graphics, x, y, (ch, px, py) -> {
-						if (ch == '.' || (half && px < 4 && ch != 'o')) {
-							return 0;
-						}
-						return switch (ch) {
-							case 'o' -> ARGB.color(alpha, 0x2A1A06);
-							case 'w' -> ARGB.color(alpha, 0xF4F0FF);
-							default -> ARGB.color(alpha, 0xFFC46B);
-						};
-					});
+					Identifier icon = halvesNew == 1
+						? PixelIcon.FOOD.fixed("preview_half", (ch, px, py) -> previewFood(ch, px < 4))
+						: PixelIcon.FOOD.fixed("preview_full", (ch, px, py) -> previewFood(ch, false));
+					PixelIcon.FOOD.blit(graphics, icon, x, y, ARGB.color(alpha, 0xFFFFFF));
 				}
 			}
 		}
@@ -248,9 +271,12 @@ public final class FoodInfo {
 			if (coveredTo <= coveredFrom || coveredTo < 0.5f) {
 				continue;
 			}
-			boolean full = coveredTo >= 1.5f;
 			int x = right - i * 8 - 9;
-			PixelIcon.FOOD.draw(graphics, x, y, (ch, px, py) -> ch == 'o' && (full || px >= 4) ? color : 0);
+			Identifier icon = coveredTo >= 1.5f
+				? PixelIcon.FOOD.fixed("saturation_full", (ch, px, py) -> ch == 'o' ? 0xFFFFFFFF : 0)
+				: PixelIcon.FOOD.fixed("saturation_half", (ch, px, py) -> ch == 'o' && px >= 4 ? 0xFFFFFFFF : 0);
+			// weißer Umriss, eingefärbt mit Sättigungsfarbe und Deckkraft
+			PixelIcon.FOOD.blit(graphics, icon, x, y, color);
 		}
 	}
 }

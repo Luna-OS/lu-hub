@@ -79,6 +79,8 @@ public final class LuHubClientTest implements FabricClientGameTest {
 			context.takeScreenshot("luhub-04-hud-bi");
 			setStyle(context, BarStyle.NIGHT);
 
+			compareHud(context, world);
+
 			context.getInput().pressKey(options -> options.keyDebugOverlay);
 			context.waitTicks(10);
 			context.takeScreenshot("luhub-05-f3");
@@ -355,6 +357,126 @@ public final class LuHubClientTest implements FabricClientGameTest {
 		context.waitTicks(10);
 		context.getInput().setCursorPos(2, 2);
 		context.waitTicks(2);
+	}
+
+	/**
+	 * Die neue HUD (gebackene Texturen) muss pixelgenau wie die alte (pixelweise gezeichnete) aussehen –
+	 * in allen Stilen und Zuständen: Nachthimmel, Pride, eigene Farben, Gift, Wither, Absorption, Hunger-Effekt,
+	 * Regeneration, Blinken nach Schaden, Halb-Symbole und unter Wasser.
+	 */
+	private static void compareHud(ClientGameTestContext context, TestSingleplayerContext world) {
+		context.runOnClient(mc -> {
+			for (HudElementType type : HudElementType.values()) {
+				LuConfig.get().hud(type).sparkle = false; // Funkeln ist zeitabhängig – für den Vergleich aus
+			}
+		});
+		context.waitTicks(30); // Schadens-Sperrzeit abwarten, sonst blinkt nur eine der beiden Versionen
+		compareHudScreenshot(context, "night");
+		setStyle(context, BarStyle.TRANS);
+		compareHudScreenshot(context, "trans");
+		setStyle(context, BarStyle.PROGRESS);
+		compareHudScreenshot(context, "progress");
+		context.runOnClient(mc -> {
+			for (HudElementType type : HudElementType.values()) {
+				var ec = LuConfig.get().hud(type);
+				ec.fillColor = 0xFF3FD0A8;
+				ec.emptyColor = 0xFF402040;
+				ec.outlineColor = 0xFF101830;
+			}
+		});
+		setStyle(context, BarStyle.CUSTOM);
+		compareHudScreenshot(context, "custom");
+		setStyle(context, BarStyle.NIGHT);
+		world.getServer().runCommand("effect give @a poison 30 0 true");
+		world.getServer().runCommand("effect give @a hunger 30 0 true");
+		compareHudScreenshot(context, "poison-hunger");
+		world.getServer().runCommand("effect clear @a poison");
+		world.getServer().runCommand("effect give @a wither 30 0 true");
+		world.getServer().runCommand("effect give @a regeneration 30 0 true");
+		compareHudScreenshot(context, "wither-regen");
+		world.getServer().runCommand("effect clear @a");
+		world.getServer().runCommand("effect give @a absorption 600 1 true");
+		context.waitTicks(30);
+		// beide Versionen müssen den Treffer mitbekommen: Vergleich schon vor dem Schaden öffnen
+		context.setScreen(HudCompareScreen::new);
+		context.waitTicks(3);
+		world.getServer().runCommand("damage @p 3");
+		context.waitTicks(4);
+		compareHudScreenshot(context, "damage-blink");
+		world.getServer().runCommand("setblock ~ ~ ~ minecraft:water");
+		world.getServer().runCommand("setblock ~ ~1 ~ minecraft:water");
+		context.waitTicks(90);
+		compareHudScreenshot(context, "underwater");
+		world.getServer().runCommand("setblock ~ ~ ~ minecraft:air");
+		world.getServer().runCommand("setblock ~ ~1 ~ minecraft:air");
+		world.getServer().runCommand("effect clear @a");
+		world.getServer().runCommand("effect give @a absorption 600 0 true");
+		context.runOnClient(mc -> {
+			for (HudElementType type : HudElementType.values()) {
+				var ec = LuConfig.get().hud(type);
+				var d = HudElementType.createDefault(type);
+				ec.fillColor = d.fillColor;
+				ec.emptyColor = d.emptyColor;
+				ec.outlineColor = d.outlineColor;
+				ec.sparkle = true;
+			}
+		});
+		context.waitTicks(40);
+	}
+
+	private static void compareHudScreenshot(ClientGameTestContext context, String name) {
+		if (!context.computeOnClient(mc -> mc.gui.screen() instanceof HudCompareScreen)) {
+			context.setScreen(HudCompareScreen::new);
+			context.waitTicks(3);
+		}
+		java.nio.file.Path shot = context.takeScreenshot("luhub-cmp-" + name);
+		context.runOnClient(mc -> System.out.printf("[Lu Hub] GUI-Elemente %s: HUD neu %d / alt %d, Mond neu %d / alt %d, Sternenhimmel neu %d / alt %d%n", name,
+			HudCompareScreen.HUD_ELEMENTS[0], HudCompareScreen.HUD_ELEMENTS[1], HudCompareScreen.MOON_ELEMENTS[0], HudCompareScreen.MOON_ELEMENTS[1],
+			HudCompareScreen.SKY_ELEMENTS[0], HudCompareScreen.SKY_ELEMENTS[1]));
+		int scale = context.computeOnClient(mc -> (int) mc.getWindow().getGuiScale());
+		context.setScreen(() -> null);
+		try {
+			java.awt.image.BufferedImage image = javax.imageio.ImageIO.read(shot.toFile());
+			int shift = HudCompareScreen.SHIFT * scale;
+			int height = image.getHeight();
+			int diff = 0;
+			int compared = 0;
+			int firstX = -1;
+			int firstY = -1;
+			// Mond-Streifen oben und HUD-Streifen unten: neue Version liegt genau SHIFT Pixel unter der alten
+			// {von y, bis y, bis x} – beim Mond nur links, rechts oben liegen Fortschritts-Meldungen
+			int[][] bands = {
+				{(HudCompareScreen.MOON_Y + HudCompareScreen.SHIFT - 2) * scale, (HudCompareScreen.MOON_Y + HudCompareScreen.SHIFT + 44) * scale, 100 * scale},
+				{height - 56 * scale, height, image.getWidth()}
+			};
+			for (int[] band : bands) {
+				for (int y = Math.max(shift, band[0]); y < Math.min(height, band[1]); y++) {
+					for (int x = 0; x < Math.min(image.getWidth(), band[2]); x++) {
+						int now = image.getRGB(x, y);
+						int before = image.getRGB(x, y - shift);
+						if (now != 0xFF000000 || before != 0xFF000000) {
+							compared++;
+						}
+						if (now != before) {
+							if (diff == 0) {
+								firstX = x;
+								firstY = y;
+							}
+							diff++;
+						}
+					}
+				}
+			}
+			if (compared < 500) {
+				throw new AssertionError("HUD-Vergleich " + name + ": zu wenig gezeichnet (" + compared + " Pixel)");
+			}
+			if (diff > 0) {
+				throw new AssertionError("HUD-Vergleich " + name + ": " + diff + " von " + compared + " Pixeln weichen ab, z.B. bei "
+					+ firstX + "," + firstY + " (Screenshot " + shot.getFileName() + ")");
+			}
+		} catch (java.io.IOException e) {
+			throw new java.io.UncheckedIOException(e);
+		}
 	}
 
 	/** Kohle muss im Tooltip ihre Brenndauer zeigen. */

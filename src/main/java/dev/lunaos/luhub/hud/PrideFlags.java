@@ -3,12 +3,28 @@ package dev.lunaos.luhub.hud;
 import dev.lunaos.luhub.config.BarStyle;
 import dev.lunaos.luhub.theme.NightTheme;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 /** Streifenfarben der Pride-Flaggen (von oben nach unten). */
 public final class PrideFlags {
+	private static final Map<BarStyle, int[]> STRIPES = new EnumMap<>(BarStyle.class);
+
+	static {
+		for (BarStyle style : BarStyle.values()) {
+			STRIPES.put(style, create(style));
+		}
+	}
+
 	private PrideFlags() {
 	}
 
+	/** Streifen der Flagge – das Array wird geteilt und darf nicht verändert werden. */
 	public static int[] stripes(BarStyle style) {
+		return STRIPES.get(style);
+	}
+
+	private static int[] create(BarStyle style) {
 		return switch (style) {
 			case RAINBOW -> new int[]{0xFFE40303, 0xFFFF8C00, 0xFFFFED00, 0xFF008026, 0xFF004DFF, 0xFF750787};
 			case PROGRESS -> new int[]{0xFFFFFFFF, 0xFFF5A9B8, 0xFF5BCEFA, 0xFF613915, 0xFF000000,

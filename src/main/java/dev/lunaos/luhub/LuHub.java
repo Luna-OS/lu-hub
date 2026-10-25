@@ -7,6 +7,7 @@ import dev.lunaos.luhub.config.LuConfig;
 import dev.lunaos.luhub.hud.LuHud;
 import dev.lunaos.luhub.mixin.AbstractContainerScreenAccessor;
 import dev.lunaos.luhub.mixin.ImageButtonAccessor;
+import dev.lunaos.luhub.render.BakedTextures;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
@@ -47,6 +48,7 @@ public final class LuHub implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		LuConfig.load();
+		BakedTextures.register();
 		LuHud.register();
 
 		keySettings = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.settings", InputConstants.Type.KEYBOARD, InputConstants.KEY_Y, CATEGORY));

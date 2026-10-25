@@ -5,6 +5,9 @@ Alles in einer Mod – im Nachthimmel- & Mond-Theme mit Axo 🌙
 **Benötigt:** Fabric Loader 0.19.5+, Fabric API 0.163.0+26.3
 **Optional:** REI, Mod Menu, Plasmo Voice, Tutorial Tracker
 
+## Neu in dieser Version
+- **Viel schneller:** HUD-Symbole, XP-Leiste, Mond und Sternenhimmel werden einmal in Texturen gebacken statt Pixel für Pixel gezeichnet – rund 40× weniger GUI-Elemente pro Frame bei pixelgenau gleichem Aussehen
+
 ## Enthalten
 - **F3-Ansicht:** farbig markiert, voll anpassbar, per Drag & Drop verschiebbar, eigene Umschalt-Taste
 - **HUD im eigenen Theme:** Herzen, Hunger, Luftblasen, XP-Leiste, Rüstung und Hotbar – frei verschieben & per Ecke größer/kleiner ziehen (Taste `G`), Pride-Varianten, ausgewählter Hotbar-Slot heller
