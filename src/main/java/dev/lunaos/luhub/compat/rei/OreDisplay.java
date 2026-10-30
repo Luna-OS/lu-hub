@@ -1,5 +1,6 @@
 package dev.lunaos.luhub.compat.rei;
 
+import dev.lunaos.luhub.ore.OreData;
 import me.shedaniel.rei.api.common.category.CategoryIdentifier;
 import me.shedaniel.rei.api.common.display.DisplaySerializer;
 import me.shedaniel.rei.api.common.display.basic.BasicDisplay;

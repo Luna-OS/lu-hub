@@ -1,4 +1,4 @@
-package dev.lunaos.luhub.compat.rei;
+package dev.lunaos.luhub.ore;
 
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -77,6 +77,8 @@ public enum OreData {
 	public final Item drop;
 	public final List<Item> blocks;
 	public final List<Band> bands;
+	/** Höchste Dichte in der Dimension – zum Skalieren, einmal berechnet. */
+	private float maxDensity = -1f;
 
 	OreData(int color, Dim dim, int bestY, int rangeMin, int rangeMax, Item drop, List<Item> blocks, Band... bands) {
 		this.color = color;
@@ -113,11 +115,51 @@ public enum OreData {
 
 	/** Höchste Dichte im Bereich der Dimension (normal + besondere Bänder) – zum Skalieren der Kurve. */
 	public float maxDensity() {
-		float max = 0f;
-		for (int y = dim.minY; y <= dim.maxY; y++) {
-			max = Math.max(max, density(y, false) + density(y, true));
+		if (maxDensity < 0f) {
+			float max = 0f;
+			for (int y = dim.minY; y <= dim.maxY; y++) {
+				max = Math.max(max, density(y, false) + density(y, true));
+			}
+			maxDensity = max;
 		}
-		return max;
+		return maxDensity;
+	}
+
+	/** Niedrigste Höhe, auf der das Erz überhaupt vorkommt (innerhalb der Dimension). */
+	public int presenceMin() {
+		for (int y = dim.minY; y <= dim.maxY; y++) {
+			if (relative(y) > 0f) {
+				return y;
+			}
+		}
+		return dim.minY;
+	}
+
+	/** Höchste Höhe, auf der das Erz überhaupt vorkommt (innerhalb der Dimension). */
+	public int presenceMax() {
+		for (int y = dim.maxY; y >= dim.minY; y--) {
+			if (relative(y) > 0f) {
+				return y;
+			}
+		}
+		return dim.maxY;
+	}
+
+	/** Wie viel es auf Höhe y gibt, relativ zur besten Höhe (0 = nichts, 1 = am meisten). */
+	public float relative(int y) {
+		float max = maxDensity();
+		return max <= 0f ? 0f : (density(y, false) + density(y, true)) / max;
+	}
+
+	/** Bewertung einer relativen Menge in Worten: perfekt, gut, mittel, wenig, keins. */
+	public static Component rating(float relative) {
+		String key = relative >= 0.8f ? "perfect" : relative >= 0.5f ? "good" : relative >= 0.2f ? "medium" : relative > 0f ? "low" : "none";
+		return Component.translatable("luhub.ores.rating." + key);
+	}
+
+	/** Farbe der Bewertung (grün = perfekt ... grau = keins). */
+	public static int ratingColor(float relative) {
+		return relative >= 0.8f ? 0xFF7CF08A : relative >= 0.5f ? 0xFFC8F07C : relative >= 0.2f ? 0xFFFFD27F : relative > 0f ? 0xFFFF9A6B : 0xFF8A8FB0;
 	}
 
 	public Component label() {

@@ -38,7 +38,11 @@ public final class NightTheme {
 		/** Fenster mit Slots: Hintergrund #C6C6C6, Slots #8B8B8B. */
 		PANEL(new int[]{0, 55, 85, 139, 198, 255}),
 		/** Knöpfe &amp; Co.: Knopf #6F6F6F, deaktiviert #2C2C2C, helle Kante #A0A0A0. */
-		WIDGET(new int[]{0, 44, 85, 111, 165, 255});
+		WIDGET(new int[]{0, 44, 85, 111, 165, 255}),
+		/** REI im Dunkel-Modus: Hintergrund #2F2F2F, Slots #303030 (fast gleich hell – daher feste Zuordnung). */
+		REI_DARK(new int[]{0, 11, 47, 48, 98, 255}),
+		/** REI-Knöpfe im Dunkel-Modus (#333333–#393939): wie Vanilla-Knöpfe, nur dunkler. */
+		REI_DARK_WIDGET(new int[]{0, 44, 85, 111, 165, 255});
 
 		final int[] grays;
 
@@ -66,14 +70,23 @@ public final class NightTheme {
 		int[] colors(Kind kind) {
 			return switch (kind) {
 				case PANEL -> new int[]{border, shadow, lerp(shadow, slot, 0.6f), slot, background, highlight};
-				case WIDGET -> new int[]{border, darken(background, 0.45f), lerp(shadow, background, 0.5f), background,
+				case WIDGET, REI_DARK_WIDGET -> new int[]{border, darken(background, 0.45f), lerp(shadow, background, 0.5f), background,
 					lerp(background, highlight, 0.45f), highlight};
+				case REI_DARK -> new int[]{border, shadow, background, slot, highlight, highlight};
 			};
 		}
 	}
 
 	private static boolean allGuis() {
 		return LuConfig.get().themeAllGuis;
+	}
+
+	private static final String REI_NAMESPACE = "roughlyenoughitems";
+
+	/** Wird REI ins Theme geholt? Dann läuft REI im Dunkel-Modus, dessen Texturen hier umgefärbt werden. */
+	public static boolean themesRei() {
+		LuConfig c = LuConfig.get();
+		return c.themeEnabled && c.themeAllGuis && c.themeRei;
 	}
 
 	/** Soll eine eigenständige Textur (z.B. textures/gui/container/furnace.png) umgefärbt werden? */
@@ -86,6 +99,10 @@ public final class NightTheme {
 		boolean vanilla = id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
 		if (path.startsWith("textures/gui/container/")) {
 			return vanilla || c.themeModdedContainers ? Kind.PANEL : null;
+		}
+		if (id.getNamespace().equals(REI_NAMESPACE)) {
+			boolean reiPanel = path.equals("textures/gui/recipecontainer_dark.png") || path.equals("textures/gui/display_dark.png");
+			return reiPanel && themesRei() ? Kind.REI_DARK : null;
 		}
 		if (path.startsWith("textures/gui/sprites/") && path.endsWith(".png")) {
 			// manche Mods (z.B. Plasmo Voice) laden GUI-Sprites als einzelne Texturen statt aus dem Atlas
@@ -118,6 +135,12 @@ public final class NightTheme {
 		boolean vanilla = id.getNamespace().equals(Identifier.DEFAULT_NAMESPACE);
 		if (path.startsWith("container/")) {
 			return vanilla || c.themeModdedContainers ? Kind.PANEL : null;
+		}
+		if (id.getNamespace().equals(REI_NAMESPACE)) {
+			if (!themesRei() || !path.endsWith("_dark")) {
+				return null;
+			}
+			return path.startsWith("widget/panel_") ? Kind.REI_DARK : path.startsWith("widget/button") ? Kind.REI_DARK_WIDGET : null;
 		}
 		if (!vanilla) {
 			return null;
@@ -178,7 +201,11 @@ public final class NightTheme {
 				if (!grayish) {
 					continue;
 				}
-				int color = mapGray(lum, grays, colors);
+				int color = switch (kind) {
+					case REI_DARK -> reiDarkColor(argb & 0xFFFFFF, lum, palette);
+					case REI_DARK_WIDGET -> mapGray(Math.min(255, lum * 21 / 10), grays, colors);
+					default -> mapGray(lum, grays, colors);
+				};
 				if (stars && a == 0xFF && isStarGround(kind, argb & 0xFFFFFF, lum)) {
 					float v = hash(x, y, seed);
 					float scale = kind == Kind.WIDGET ? 0.35f : 1f;
@@ -196,7 +223,29 @@ public final class NightTheme {
 	}
 
 	private static boolean isStarGround(Kind kind, int rgb, int lum) {
-		return kind == Kind.PANEL ? rgb == VANILLA_BACKGROUND : lum >= 105 && lum <= 117;
+		return switch (kind) {
+			case PANEL -> rgb == VANILLA_BACKGROUND;
+			case REI_DARK -> rgb == 0x2F2F2F;
+			default -> lum >= 105 && lum <= 117;
+		};
+	}
+
+	/** Feste Zuordnung der Grautöne aus REIs Dunkel-Texturen zur Theme-Palette. */
+	private static int reiDarkColor(int rgb, int lum, Palette p) {
+		return switch (rgb) {
+			case 0x000000 -> p.border();
+			case 0x0B0B0B -> p.shadow();
+			case 0x121212, 0x1E1E1E -> lerp(p.shadow(), p.background(), 0.35f);
+			case 0x2A2A2A -> lerp(p.shadow(), p.background(), 0.7f);
+			case 0x2F2F2F -> p.background();
+			case 0x303030 -> p.slot();
+			case 0x3A3A3A -> lerp(p.background(), p.highlight(), 0.25f);
+			case 0x414141 -> lerp(p.background(), p.highlight(), 0.5f);
+			case 0x555555 -> lerp(p.slot(), p.highlight(), 0.4f);
+			case 0x626262, 0x9E9E9E -> p.highlight();
+			case 0xFFFFFF -> lerp(p.highlight(), 0xFFFFFFFF, 0.5f);
+			default -> mapGray(lum, Kind.REI_DARK.grays, p.colors(Kind.REI_DARK));
+		};
 	}
 
 	private static int mapGray(int gray, int[] grays, int[] colors) {

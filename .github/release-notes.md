@@ -6,7 +6,8 @@ Alles in einer Mod – im Nachthimmel- & Mond-Theme mit Axo 🌙
 **Optional:** REI, Mod Menu, Plasmo Voice, Tutorial Tracker
 
 ## Neu in dieser Version
-- **Viel schneller:** HUD-Symbole, XP-Leiste, Mond und Sternenhimmel werden einmal in Texturen gebacken statt Pixel für Pixel gezeichnet – rund 40× weniger GUI-Elemente pro Frame bei pixelgenau gleichem Aussehen
+- **Erz-Höhen grafisch (Taste `O`, auch ohne REI):** wo es am meisten/wenigsten gibt (Farbskala), ★ perfekte Höhe, deine eigene Höhe mit Bewertung
+- **REI-Fixes:** REI im Nachthimmel-Theme mit lesbarer Schrift, Itemliste überdeckt keine verschobenen Fenster/Knöpfe mehr, kein „!“-Knopf mehr neben Lu-Hub-Seiten
 
 ## Enthalten
 - **F3-Ansicht:** farbig markiert, voll anpassbar, per Drag & Drop verschiebbar, eigene Umschalt-Taste

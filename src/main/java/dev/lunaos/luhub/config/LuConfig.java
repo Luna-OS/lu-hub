@@ -39,6 +39,8 @@ public final class LuConfig {
 	public boolean windowDrag = true;
 	/** Verschiebung je Fenstertyp (Klassenname des Screens) in GUI-Pixeln: [x, y]. */
 	public Map<String, int[]> windowOffsets = new java.util.HashMap<>();
+	/** REI (Rezept-Fenster, Knöpfe, Leisten) ebenfalls im Nachthimmel-Theme – mit heller, gut lesbarer Schrift. */
+	public boolean themeRei = true;
 	/** Beim Raustabben nicht automatisch das Pausemenü öffnen. */
 	public boolean noAutoPause = true;
 	/** Shulkerkisten-GUI in der Farbe der Shulkerkiste (im Theme-Stil). */

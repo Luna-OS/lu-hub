@@ -191,6 +191,10 @@ public final class LuConfigScreen extends Screen {
 		toggle("luhub.config.axo_enabled", c.axoEnabled, v -> c.axoEnabled = v);
 		toggle("luhub.config.window_drag", c.windowDrag, v -> c.windowDrag = v);
 		toggle("luhub.config.no_auto_pause", c.noAutoPause, v -> c.noAutoPause = v);
+		add(Button.builder(Component.translatable("luhub.config.ore_heights"), b -> {
+			LuConfig.save();
+			minecraft.gui.setScreen(new OreHeightScreen(this));
+		}).bounds(0, 0, 100, 20).build());
 		button("luhub.config.reset_windows", b -> {
 			c.windowOffsets.clear();
 			LuConfig.save();
@@ -296,6 +300,7 @@ public final class LuConfigScreen extends Screen {
 		color("luhub.config.color_selected_slot", () -> c.colorSelectedSlot, v -> c.colorSelectedSlot = v);
 		toggle("luhub.config.theme_recipe_book", c.themeRecipeBook, v -> c.themeRecipeBook = v, true);
 		toggle("luhub.config.theme_modded", c.themeModdedContainers, v -> c.themeModdedContainers = v, true);
+		toggle("luhub.config.theme_rei", c.themeRei, v -> c.themeRei = v, true).active = ExternalMods.REI;
 		toggle("luhub.config.night_background", c.nightBackground, v -> c.nightBackground = v);
 		toggle("luhub.config.title_screen", c.titleScreenTheme, v -> c.titleScreenTheme = v);
 		toggle("luhub.config.moon", c.moonDecoration, v -> c.moonDecoration = v);

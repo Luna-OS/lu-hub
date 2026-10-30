@@ -12,6 +12,7 @@ import dev.lunaos.luhub.sort.Sorter;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
+import dev.lunaos.luhub.screen.OreHeightScreen;
 import dev.lunaos.luhub.screen.TooltipEditorScreen;
 import net.fabricmc.fabric.api.client.gametest.v1.FabricClientGameTest;
 import net.fabricmc.fabric.api.client.screen.v1.Screens;
@@ -260,9 +261,29 @@ public final class LuHubClientTest implements FabricClientGameTest {
 				context.takeScreenshot("luhub-21c-rei-hint");
 				openRei(context, "villager_trades", Items.ENCHANTED_BOOK);
 				context.takeScreenshot("luhub-21b-rei-trades");
+				// verschobenes Inventar über REIs Itemliste: REI muss Platz lassen
+				context.runOnClient(mc -> LuConfig.get().windowOffsets.put(InventoryScreen.class.getName(), new int[]{170, 0}));
+				context.setScreen(() -> new InventoryScreen(context.computeOnClient(mc -> mc.player)));
+				context.waitTicks(10);
+				context.getInput().setCursorPos(2, 2);
+				context.waitTicks(2);
+				context.takeScreenshot("luhub-21d-rei-window-over-list");
+				context.runOnClient(mc -> LuConfig.get().windowOffsets.clear());
 				context.setScreen(() -> null);
 				context.waitTicks(3);
 			}
+
+			// Erz-Höhen auch ohne REI (Taste O)
+			context.setScreen(() -> new OreHeightScreen(null));
+			context.waitTicks(5);
+			context.getInput().setCursorPos(2, 2);
+			context.waitTicks(2);
+			context.takeScreenshot("luhub-22-ore-screen-overview");
+			context.runOnClient(mc -> mc.gui.screen().mouseScrolled(0, 0, 0, -1));
+			context.waitTicks(3);
+			context.takeScreenshot("luhub-22b-ore-screen-diamond");
+			context.setScreen(() -> null);
+			context.waitTicks(3);
 
 			context.setScreen(() -> new PauseScreen(true));
 			context.waitTicks(5);

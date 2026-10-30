@@ -11,6 +11,7 @@ import dev.lunaos.luhub.render.BakedTextures;
 import dev.lunaos.luhub.screen.DebugEditorScreen;
 import dev.lunaos.luhub.screen.HudEditorScreen;
 import dev.lunaos.luhub.screen.LuConfigScreen;
+import dev.lunaos.luhub.screen.OreHeightScreen;
 import dev.lunaos.luhub.screen.WindowDrag;
 import dev.lunaos.luhub.sort.SortButtons;
 import dev.lunaos.luhub.theme.ThemeDecor;
@@ -44,6 +45,7 @@ public final class LuHub implements ClientModInitializer {
 	public static KeyMapping keyDebugEditor;
 	public static KeyMapping keyDebugToggle;
 	public static KeyMapping keySort;
+	public static KeyMapping keyOres;
 
 	@Override
 	public void onInitializeClient() {
@@ -57,6 +59,7 @@ public final class LuHub implements ClientModInitializer {
 		keyDebugToggle = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.debug_toggle", InputConstants.Type.KEYBOARD, InputConstants.UNKNOWN.getValue(), CATEGORY));
 
 		keySort = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.sort", InputConstants.Type.KEYBOARD, InputConstants.KEY_R, CATEGORY));
+		keyOres = KeyMappingHelper.registerKeyMapping(new KeyMapping("key.luhub.ores", InputConstants.Type.KEYBOARD, InputConstants.KEY_O, CATEGORY));
 
 		LuTooltips.register();
 		SortButtons.register();
@@ -74,9 +77,9 @@ public final class LuHub implements ClientModInitializer {
 	 */
 	private static void resolveKeyConflicts(Minecraft mc) {
 		int[] candidates = {InputConstants.KEY_Y, InputConstants.KEY_G, InputConstants.KEY_N, InputConstants.KEY_Z,
-			InputConstants.KEY_F7, InputConstants.KEY_F8, InputConstants.KEY_F9};
+			InputConstants.KEY_O, InputConstants.KEY_J, InputConstants.KEY_F7, InputConstants.KEY_F8, InputConstants.KEY_F9};
 		boolean changed = false;
-		for (KeyMapping key : new KeyMapping[]{keySettings, keyHudEditor, keyDebugEditor, keyDebugToggle}) {
+		for (KeyMapping key : new KeyMapping[]{keySettings, keyHudEditor, keyDebugEditor, keyDebugToggle, keyOres}) {
 			InputConstants.Key bound = KeyMappingHelper.getBoundKeyOf(key);
 			if (bound.equals(InputConstants.UNKNOWN) || !usedByOtherMod(mc, key, bound)) {
 				continue;
@@ -131,6 +134,9 @@ public final class LuHub implements ClientModInitializer {
 		}
 		while (keyDebugEditor.consumeClick()) {
 			mc.gui.setScreen(new DebugEditorScreen(null));
+		}
+		while (keyOres.consumeClick()) {
+			mc.gui.setScreen(new OreHeightScreen(null));
 		}
 		while (keyDebugToggle.consumeClick()) {
 			mc.debugEntries.toggleDebugOverlay();

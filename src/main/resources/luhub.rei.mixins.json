@@ -1,0 +1,14 @@
+{
+	"required": false,
+	"package": "dev.lunaos.luhub.mixin.rei",
+	"plugin": "dev.lunaos.luhub.mixin.rei.LuReiMixinPlugin",
+	"compatibilityLevel": "JAVA_25",
+	"client": [
+		"ReiAutoCraftButtonMixin",
+		"ReiDarkThemeMixin",
+		"ReiHeaderStripesMixin"
+	],
+	"injectors": {
+		"defaultRequire": 0
+	}
+}

@@ -93,14 +93,22 @@ Sternenhimmel-Schleier, Sternschnuppen und Mond über dem Panorama; Knöpfe im T
 Die Fenster von Tutorial Tracker (Luna-OS) erscheinen automatisch im Nachthimmel-Theme.
 Belegt eine andere Mod dieselbe Taste wie Lu Hub, weicht Lu Hub beim Start auf eine freie Taste aus.
 
-### REI: Erz-Höhen und Dorfbewohner
-Mit [REI](https://modrinth.com/mod/rei) gibt es drei neue Seiten im Nachthimmel-Stil:
-- **Erz-Höhen:** pro Erz die Verteilung über die Höhe als Kurve (Werte direkt aus 26.3), beste Höhe, guter Abbau-Bereich
-  und ein Tipp; Biom-abhängige Anteile (Gold in Tafelbergen, Smaragd in Bergen, Kupfer in Tropfsteinhöhlen) sind
-  schraffiert. Dazu eine Übersicht aller Erze für Oberwelt und Nether. Maus über die Kurve zeigt die Häufigkeit bei jedem Y.
-- **Dorfbewohner-Berufe:** welcher Arbeitsblock welchen Beruf gibt und was der Beruf sammelt
-- **Dorfbewohner-Handel:** alle Angebote je Beruf und Stufe (Neuling … Meister) inkl. Fahrendem Händler –
-  `R` auf einem Item zeigt, wer es verkauft, `U` wer es kauft. Im Einzelspieler inklusive Datenpaketen, auf Servern die Vanilla-Handel.
+### Erz-Höhen (Taste `O`, auch ohne REI)
+Für jedes Erz grafisch, **wo es am meisten und wo am wenigsten gibt**: Die Kurve ist umso breiter und heller,
+je mehr es auf dieser Höhe gibt (Farbskala „wenig → am meisten“), dunkel bzw. leer heißt kaum oder keins.
+- **★ Perfekte Höhe** groß angezeigt und im Diagramm markiert, dazu „Am meisten: Y … bis …“ und „Vorkommen: Y … bis …“
+- **Deine Höhe** als Linie „Du“ mit Bewertung (perfekt / gut / mittel / wenig / keins)
+- Biom-abhängige Anteile (Gold in Tafelbergen, Smaragd in Bergen, Kupfer in Tropfsteinhöhlen) schraffiert
+- Übersicht aller Erze für Oberwelt und Nether; Maus über die Kurve zeigt die Häufigkeit bei jedem Y
+- Werte direkt aus den 26.3-Platzierungen; dieselbe Grafik gibt es in REI als Kategorie „Erz-Höhen“
+
+### REI
+- **Dorfbewohner-Berufe** (welcher Arbeitsblock welchen Beruf gibt) und **Dorfbewohner-Handel** je Beruf und Stufe
+  inkl. Fahrendem Händler – `R` auf einem Item zeigt, wer es verkauft, `U` wer es kauft
+- **REI im Theme:** Rezept-Fenster, Leisten und Knöpfe im Nachthimmel-Stil mit heller, lesbarer Schrift
+  (abschaltbar unter Einstellungen → Theme → „REI im Theme“)
+- REIs Itemliste überdeckt keine verschobenen Fenster und keine Knöpfe neben dem Fenster mehr
+- Der nutzlose „!“-Knopf neben den Lu-Hub-Seiten ist weg
 
 ### Kein Auto-Pause
 Beim Raustabben öffnet sich nicht mehr das Pausemenü (abschaltbar unter Einstellungen → Allgemein).
